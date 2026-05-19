@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#A4E2FC"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/txtTitre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Poisson Glace"
+        android:textColor="#FFD700"
+        android:textSize="54sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.398"
+        app:layout_constraintStart_toEndOf="@+id/btnJoueurs2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/btnJoueurs2"
+        android:layout_width="81dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bouton_rond_bordure"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="Retour"
+        android:textColor="#FFD700"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/container_rows"
+        android:layout_width="565dp"
+        android:layout_height="186dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnJoueurs2"
+                android:layout_width="47dp"
+                android:layout_height="64dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="J1"
+                android:textColor="#FFD700"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="16dp" />
+
+            <Spinner
+                android:layout_width="362dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:background="#E0E0E0"
+                android:spinnerMode="dropdown"
+                tools:listitem="@android:layout/simple_spinner_item" />
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnJoueurs2"
+                android:layout_width="48dp"
+                android:layout_height="64dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="#FFD700"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnJoueurs2"
+                android:layout_width="58dp"
+                android:layout_height="64dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="J2"
+                android:textColor="#FFD700"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:layout_width="373dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:background="#E0E0E0"
+                android:spinnerMode="dropdown"
+                tools:listitem="@android:layout/simple_spinner_item" />
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnJoueurs2"
+                android:layout_width="61dp"
+                android:layout_height="64dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="#FFD700"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/btnRegles"
+        android:layout_width="161dp"
+        android:layout_height="73dp"
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Commencer"
+        android:textColor="#FFD700"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

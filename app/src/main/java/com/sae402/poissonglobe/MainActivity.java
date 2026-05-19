@@ -1,6 +1,7 @@
 package com.sae402.poissonglobe;
 
 import android.os.Bundle;
+import android.util.Log;import java.util.List;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,10 +16,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);return insets;
         });
+
+        // --- TEST DE LA BASE DE DONNÉES ---// 1. Récupérer l'instance de la base
+        AppDatabase db = AppDatabase.getAppDatabase(this);
+
+        // 2. Récupérer la liste des joueurs
+        List<JoueurBD> listeJoueurs = db.getJeuDAO().getAllJoueurs();
+
+        // 3. Afficherles joueurs dans le Logcat pour vérifier
+        if (listeJoueurs.isEmpty()) {
+            Log.d("MA_BASE", "La base est vide...");
+        } else {
+            for (JoueurBD j : listeJoueurs) {
+                Log.d("MA_BASE", "Joueur trouvé : " + j.nom +" (ID: " + j.id + ")");
+            }
+        }
     }
 }

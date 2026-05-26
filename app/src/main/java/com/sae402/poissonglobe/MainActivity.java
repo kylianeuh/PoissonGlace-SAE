@@ -2,8 +2,10 @@ package com.sae402.poissonglobe;
 
 import android.os.Bundle;
 import android.view.View;
-import android.util.Log;import java.util.List;
+import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -28,18 +30,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-          
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);return insets;
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        return insets;
         });
 
-        // --- TEST DE LA BASE DE DONNÉES ---// 1. Récupérer l'instance de la base
         AppDatabase db = AppDatabase.getAppDatabase(this);
-
-        // 2. Récupérer la liste des joueurs
         List<JoueurBD> listeJoueurs = db.getJeuDAO().getAllJoueurs();
 
-        // 3. Afficherles joueurs dans le Logcat pour vérifier
         if (listeJoueurs.isEmpty()) {
             Log.d("MA_BASE", "La base est vide...");
         } else {
@@ -47,5 +46,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MA_BASE", "Joueur trouvé : " + j.nom +" (ID: " + j.id + ")");
             }
         }
+
+        ClassementFragment fragmentClassement = new ClassementFragment();
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.zoneClassement, fragmentClassement)
+                    .commit();
+        }
+
+        List<Joueur> joueursDeLaBase = new ArrayList<>();
+        joueursDeLaBase.add(new Joueur("Kylian", 150));
+        joueursDeLaBase.add(new Joueur("Lindsay", 90));
+        joueursDeLaBase.add(new Joueur("Nemo", 210));
+
+        fragmentClassement.majListeJoueurs(joueursDeLaBase);
     }
 }

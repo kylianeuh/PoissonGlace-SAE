@@ -31,7 +31,8 @@ public class JoueurPartieBD {public int joueur_id;
     // Constructeur pratique pour votre code
     public JoueurPartieBD(int joueur_id, int partie_id, int score, String resultat) {
         this.joueur_id = joueur_id;
-        this.partie_id = partie_id;this.score = score;
+        this.partie_id = partie_id;
+        this.score = score;
         this.resultat = resultat;
     }
 }

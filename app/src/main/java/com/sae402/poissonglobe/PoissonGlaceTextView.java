@@ -37,7 +37,7 @@ public class PoissonGlaceTextView extends AppCompatTextView {
         int originalColor = getCurrentTextColor();
 
         getPaint().setStyle(Paint.Style.STROKE);
-        getPaint().setStrokeWidth(20); // Épaisseur de la bordure
+        getPaint().setStrokeWidth(20);
         getPaint().setStrokeJoin(Paint.Join.ROUND);
         setTextColor(Color.WHITE);
         super.onDraw(canvas);

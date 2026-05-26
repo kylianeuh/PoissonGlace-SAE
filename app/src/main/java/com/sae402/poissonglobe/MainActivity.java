@@ -1,5 +1,6 @@
 package com.sae402.poissonglobe;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
@@ -26,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Un Intent pour aller de MainActivity vers ReglesActivity
                 android.content.Intent intent = new android.content.Intent(MainActivity.this, ReglesActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        View btnStats = findViewById(R.id.btnStats);
+        btnStats.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StatsActivity.class);
                 startActivity(intent);
             }
         });

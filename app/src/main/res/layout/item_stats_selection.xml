@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.sae402.poissonglobe.PoissonGlaceTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvPseudoSelection"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fontFamily="@font/cherry_bomb"
+    android:textSize="26sp"
+    android:textColor="#FFFFFF"
+    android:gravity="center"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground" />

@@ -21,6 +21,19 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        View logoTest = findViewById(R.id.txtTitre);
+
+        if (logoTest != null) {
+            logoTest.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Raccourci magique : on lance le jeu directement !
+                    Intent intent = new Intent(MainActivity.this, Jeu.class);
+                    startActivity(intent);
+                }
+            });
+        }
+
         View btnRegles = findViewById(R.id.btnRegles);
         btnRegles.setOnClickListener(new View.OnClickListener() {
             @Override

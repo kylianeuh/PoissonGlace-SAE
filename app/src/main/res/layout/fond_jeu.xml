@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imgEauFond"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/fond_eau"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:id="@+id/blocSableGauche"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_c" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_d" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_a" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_c" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_b" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_a" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_b" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_d" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_a" android:rotation="90" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_a" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_b" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_e" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_f" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_g" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_h" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_a" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_b" android:rotation="90" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_e" android:rotation="90" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/algueVerteA"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="30dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_grass_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteB"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="80dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_grass_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteC"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="115dp"
+        android:layout_marginTop="320dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_green_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteD"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="210dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_green_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteE"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="115dp"
+        android:layout_marginTop="400dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_green_c"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseA"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="150dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseB"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="260dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseC"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="115dp"
+        android:layout_marginTop="440dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_c"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseD"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="490dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_d"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueOrangeA"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="115dp"
+        android:layout_marginTop="410dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_orange_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/pierreA"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="180dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rock_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/pierreB"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="115dp"
+        android:layout_marginTop="370dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rock_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueOrangeB"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="115dp"
+        android:layout_marginTop="95dp"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_orange_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/blocSableDroit"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_a" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_b" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_e" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_f" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_g" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_h" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_a" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_b" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_top_e" android:rotation="270" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_a" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_c" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_b" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_d" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_b" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_a" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_d" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_c" android:rotation="270" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/terrain_sand_a" android:rotation="270" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/algueVerteA2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="260dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_grass_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteB2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="490dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_grass_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteC2"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="440dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_green_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteD2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="120dp"
+        android:layout_marginTop="80dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_green_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueVerteE2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="210dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_green_c"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseA2"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="120dp"
+        android:layout_marginTop="150dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseB2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="110dp"
+        android:layout_marginTop="320dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseC2"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="400dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_c"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueRoseD2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="30dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_pink_d"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueOrangeA2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="420dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_orange_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/pierreA2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="361dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rock_a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/pierreB2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="192dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rock_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/algueOrangeB2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="115dp"
+        android:layout_marginTop="130dp"
+        android:rotation="270"
+        android:scaleType="fitCenter"
+        android:src="@drawable/seaweed_orange_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

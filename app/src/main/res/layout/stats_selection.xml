@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
+
+    <include layout="@layout/fond_complet" />
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/titreStatsSel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/cherry_bomb"
+        android:text="STATISTIQUES"
+        android:textColor="#FFD700"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/txtInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/cherry_bomb"
+        android:text="Sélectionnez le nom d'un joueur pour voir ses détails"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:paddingHorizontal="15dp"
+        app:layout_constraintTop_toBottomOf="@id/titreStatsSel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="100dp"
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:padding="24dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintTop_toBottomOf="@id/txtInstruction"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChoixJoueurs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </FrameLayout>
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/btnRetourSelection"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/cherry_bomb"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="RETOUR"
+        android:textColor="#FFD700"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

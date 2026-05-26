@@ -9,9 +9,11 @@ public interface JeuDAO {
 
     // --- JOUEURS ---
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)void insertJoueur(JoueurBD joueur);
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertJoueur(JoueurBD joueur);
 
-    @Query("SELECT * FROM JoueurBD")List<JoueurBD> getAllJoueurs();
+    @Query("SELECT * FROM JoueurBD")
+    List<JoueurBD> getAllJoueurs();
 
     @Query("SELECT * FROM JoueurBD WHERE nom = :nom LIMIT 1")
     JoueurBD getJoueurByNom(String nom);
@@ -29,7 +31,8 @@ public interface JeuDAO {
     void insertJoueurPartie(JoueurPartieBD joueurPartie);
 
     @Query("SELECT * FROM JoueurPartieBD WHERE joueur_id = :jId")
-    List<JoueurPartieBD> getScoresByJoueur(int jId);// Exemple : Récupérer les 10 meilleurs scores globaux
+    List<JoueurPartieBD> getScoresByJoueur(int jId);
+
     @Query("SELECT * FROM JoueurPartieBD ORDER BY score DESC LIMIT 10")
     List<JoueurPartieBD> getTopScores();
 }

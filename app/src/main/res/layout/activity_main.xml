@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/fond_complet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contenuPrincipal"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/zoneClassement"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/blocGauche"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnStats"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bouton_arrondi_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="Voir tous\nles joueurs"
+                android:textColor="#FFD700"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnRegles"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bouton_arrondi_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="Règles du jeu"
+                android:textColor="#FFD700"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/blocCentral"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.471"
+            app:layout_constraintStart_toEndOf="@id/blocGauche"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.324"
+            android:clipChildren="false">
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/txtTitre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="68dp"
+                android:fontFamily="@font/cherry_bomb"
+                android:text="Poisson Glace"
+                android:textColor="#FFD700"
+                android:textSize="54sp"
+                android:paddingHorizontal="25dp"
+                android:textStyle="bold" />
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/txtSelection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:text="Sélectionnez le\nnombre de joueurs"
+                android:textColor="#FFD700"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.sae402.poissonglobe.PoissonGlaceTextView
+                    android:id="@+id/btnJoueurs2"
+                    android:layout_width="115dp"
+                    android:layout_height="111dp"
+                    android:layout_marginEnd="48dp"
+                    android:background="@drawable/bouton_rond_bordure"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/cherry_bomb"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textColor="#FFD700"
+                    android:textSize="44sp"
+                    android:textStyle="bold" />
+
+                <com.sae402.poissonglobe.PoissonGlaceTextView
+                    android:id="@+id/btnJoueurs4"
+                    android:layout_width="108dp"
+                    android:layout_height="111dp"
+                    android:background="@drawable/bouton_rond_bordure"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/cherry_bomb"
+                    android:gravity="center"
+                    android:text="4"
+                    android:textColor="#FFD700"
+                    android:textSize="44sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/zoneClassement"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.25" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

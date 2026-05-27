@@ -53,6 +53,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        View btn2Joueurs = findViewById(R.id.btnJoueurs2);
+        View btn4Joueurs = findViewById(R.id.btnJoueurs4);
+
+        btn2Joueurs.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, GestionJoueurActivity.class);
+            intent.putExtra("NB_JOUEURS", 2);
+            startActivity(intent);
+        });
+
+
+        btn4Joueurs.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, GestionJoueurActivity.class);
+            intent.putExtra("NB_JOUEURS", 4);
+            startActivity(intent);
+        });
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

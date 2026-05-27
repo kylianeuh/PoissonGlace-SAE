@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".GestionJoueurActivity" />
         <activity android:name=".ReglesActivity" android:exported="false" />
         <activity android:name=".StatsActivity" android:exported="false" />
         <activity android:name=".Jeu" android:exported="false" />

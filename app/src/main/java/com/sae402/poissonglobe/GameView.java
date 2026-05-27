@@ -1,105 +1,205 @@
 package com.sae402.poissonglobe;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 public class GameView extends View {
 
-    // Nos outils de dessin
     private Paint pinceauLignes;
     private Paint pinceauButs;
 
-    // Nos variables de coordonnées (Accessibles pour la future interactivité)
-    public float ligneCentraleX;
-    public float centreX, centreY;
-    public float rayonCercleCentral;
-    public float limiteSableGauche;
-    public float limiteSableDroite;
+    // Nos pinceaux pour les textes (style PoissonGlaceTextView)
+    private Paint pinceauTexteJaune;
+    private Paint pinceauTexteContour;
 
-    // Nos rectangles de buts (Pour détecter les futurs scores)
-    public RectF rectangleButGauche;
-    public RectF rectangleButDroite;
+    // Les données de match (Le "Back" de l'arbitrage)
+    public String nomJoueurGau = "Joueur 1";
+    public String nomJoueurDro = "Joueur 2";
+    public int scoreJoueurGau = 0;
+    public int scoreJoueurDro = 0;
+
+    // Repères du terrain
+    public float ligneCentraleX, centreX, centreY;
+    public float rayonCercleCentral, limiteSableGauche, limiteSableDroite;
+    public RectF rectangleButGauche, rectangleButDroite;
+
+    // --- NOS OBJETS DE JEU (BACK) ---
+    public PoissonGlobe poissonGlobe;
+    public Bulle bulleJoueur1; // Joueur Gauche
+    public Bulle bulleJoueur2; // Joueur Droit
+
+    // --- NOS ASSETS GRAPHIQUES ---
+    private Bitmap imgPoissonGlobe;
+    private Bitmap imgBulle;
+
+    private boolean initialisationFaite = false;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initialiserTerrain();
+        initialiserTerrain(context);
     }
 
-    private void initialiserTerrain() {
-        // 1. Configuration du pinceau blanc pour les lignes du terrain
+    private void initialiserTerrain(Context context) {
         pinceauLignes = new Paint();
         pinceauLignes.setColor(Color.WHITE);
-        pinceauLignes.setStyle(Paint.Style.STROKE); // STROKE = contours uniquement
-        pinceauLignes.setStrokeWidth(12f);           // Épaisseur de la ligne
-        pinceauLignes.setAntiAlias(true);           // Lissage des bords pour éviter les pixels carrés
+        pinceauLignes.setStyle(Paint.Style.STROKE);
+        pinceauLignes.setStrokeWidth(12f);
+        pinceauLignes.setAntiAlias(true);
 
-        // 2. Configuration du pinceau marron pour l'intérieur des buts
         pinceauButs = new Paint();
-        pinceauButs.setColor(Color.parseColor("#5C4033")); // Marron terre
+        pinceauButs.setColor(Color.parseColor("#5C4033"));
         pinceauButs.setStyle(Paint.Style.FILL);
 
-        // Initialisation à vide des rectangles de buts
+        // On récupère la police Cherry Bomb
+        Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
+
+        // CONTOUR BLANC : On baisse l'épaisseur pour éviter qu'il n'étouffe le centre
+        pinceauTexteContour = new Paint();
+        pinceauTexteContour.setTypeface(typoCherry);
+        pinceauTexteContour.setColor(Color.WHITE);
+        pinceauTexteContour.setTextSize(65f); // Légèrement plus grand pour englober
+        pinceauTexteContour.setStyle(Paint.Style.STROKE);
+        pinceauTexteContour.setStrokeWidth(12f); // Épaisseur réduite (12 au lieu de 20) pour libérer le jaune
+        pinceauTexteContour.setStrokeJoin(Paint.Join.ROUND);
+        pinceauTexteContour.setAntiAlias(true);
+        pinceauTexteContour.setTextAlign(Paint.Align.CENTER);
+
+// INTÉRIEUR JAUNE : On le passe en FILL pur et on augmente sa taille !
+        pinceauTexteJaune = new Paint();
+        pinceauTexteJaune.setTypeface(typoCherry);
+        pinceauTexteJaune.setColor(Color.parseColor("#FFCC00"));
+        pinceauTexteJaune.setTextSize(65f); // Même taille de base que le contour
+        pinceauTexteJaune.setStyle(Paint.Style.FILL); // FILL pur pour éviter les conflits de tracés
+        pinceauTexteJaune.setAntiAlias(true);
+        pinceauTexteJaune.setTextAlign(Paint.Align.CENTER);
+
         rectangleButGauche = new RectF();
         rectangleButDroite = new RectF();
+
+        // CHARGEMENT DE TES IMAGES
+        imgPoissonGlobe = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_brown);
+        imgBulle = BitmapFactory.decodeResource(context.getResources(), R.drawable.bubble_c);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Étape A : Récupérer la taille réelle de l'écran en pixels
         int largeur = getWidth();
         int hauteur = getHeight();
 
-        // Repères pour la physique du sable
-        limiteSableGauche = largeur * 0.10f;
-        limiteSableDroite = largeur - (largeur * 0.10f);
+        // =======================================================================
+        // 1. CALCULS DES REPERES DU TERRAIN (Si pas encore fait)
+        // =======================================================================
+        if (!initialisationFaite) {
+            centreX = largeur / 2f;
+            centreY = hauteur / 2f;
+            ligneCentraleX = centreX;
+            limiteSableGauche = largeur * 0.10f;
+            limiteSableDroite = largeur - (largeur * 0.10f);
 
-        // Le centre mathématique de la table
-        centreX = largeur / 2f;
-        centreY = hauteur / 2f;
-        ligneCentraleX = centreX;
+            // Création des objets au centre de leurs zones respectives
+            float rayonPoisson = hauteur * 0.08f;
+            float rayonBulle = hauteur * 0.13f;
 
-        // Dimensions proportionnelles pour les buts
-        float hauteurBut = hauteur / 3f;  // Le but prend 1/3 de la hauteur de l'écran
-        float epaisseurBut = 40f;          // Largeur du rectangle marron
+            poissonGlobe = new PoissonGlobe(centreX, centreY, rayonPoisson);
+            bulleJoueur1 = new Bulle(largeur * 0.20f, centreY, rayonBulle); // Positionné dans son camp gauche
+            bulleJoueur2 = new Bulle(largeur * 0.80f, centreY, rayonBulle); // Positionné dans son camp droit
+
+            initialisationFaite = true;
+        }
+
+        float hauteurBut = hauteur / 3f;
+        float epaisseurBut = 40f;
 
         // =======================================================================
-        // 1. DESSIN DES RECTANGLES DE BUTS MARRONS (Collés aux bords physiques)
+        // 2. DESSIN DES BUTS MARRONS
         // =======================================================================
-        // But Gauche : Collé à l'extrémité gauche de l'écran (0)
         rectangleButGauche.set(0, centreY - (hauteurBut / 2f), epaisseurBut, centreY + (hauteurBut / 2f));
-
-        // But Droit : Collé à l'extrémité droite de l'écran (largeur)
         rectangleButDroite.set(largeur - epaisseurBut, centreY - (hauteurBut / 2f), largeur, centreY + (hauteurBut / 2f));
-
         canvas.drawRect(rectangleButGauche, pinceauButs);
-        canvas.drawRect(rectangleButDroite, pinceauButs); // (Attention à l'orthographe du pinceau si tu as corrigé "pinceauButs")
+        canvas.drawRect(rectangleButDroite, pinceauButs);
 
         // =======================================================================
-        // 2. TRACÉ DES LIGNES DU TERRAIN
+        // 3. DESSIN DES LIGNES BLANCHES
         // =======================================================================
-
-        // Ligne médiane
         canvas.drawLine(ligneCentraleX, 0, ligneCentraleX, hauteur, pinceauLignes);
-
-        // Cercle Central REDUIT (12% de la hauteur au lieu de 18%)
         rayonCercleCentral = hauteur * 0.09f;
         canvas.drawCircle(centreX, centreY, rayonCercleCentral, pinceauLignes);
 
-        // Zone de protection devant le but Gauche (Demi-cercle collé au bord gauche)
         float rayonZoneBut = hauteur * 0.22f;
         RectF zoneButGauche = new RectF(-rayonZoneBut, centreY - rayonZoneBut, rayonZoneBut, centreY + rayonZoneBut);
         canvas.drawArc(zoneButGauche, 270, 180, false, pinceauLignes);
 
-        // Zone de protection devant le but Droit (Demi-cercle collé au bord droit)
         RectF zoneButDroit = new RectF(largeur - rayonZoneBut, centreY - rayonZoneBut, largeur + rayonZoneBut, centreY + rayonZoneBut);
         canvas.drawArc(zoneButDroit, 90, 180, false, pinceauLignes);
+
+        // =======================================================================
+        // 4. DESSIN DES ASSETS (Poisson-Globe et Bulles)
+        // =======================================================================
+
+        // Dessin du Palet (Poisson Globe) centré sur ses coordonnées (x,y)
+        if (imgPoissonGlobe != null) {
+            RectF positionPoisson = new RectF(
+                    poissonGlobe.x - poissonGlobe.rayon,
+                    poissonGlobe.y - poissonGlobe.rayon,
+                    poissonGlobe.x + poissonGlobe.rayon,
+                    poissonGlobe.y + poissonGlobe.rayon
+            );
+            canvas.drawBitmap(imgPoissonGlobe, null, positionPoisson, null);
+        }
+
+        // Dessin des Bulles
+        if (imgBulle != null) {
+            // Dessin de la Bulle du Joueur 1 (Gauche)
+            RectF positionBulleJ1 = new RectF(
+                    bulleJoueur1.x - bulleJoueur1.rayon,
+                    bulleJoueur1.y - bulleJoueur1.rayon,
+                    bulleJoueur1.x + bulleJoueur1.rayon,
+                    bulleJoueur1.y + bulleJoueur1.rayon
+            );
+            canvas.drawBitmap(imgBulle, null, positionBulleJ1, null);
+
+            // Dessin de la Bulle du Joueur 2 (Droite)
+            RectF positionBulleJ2 = new RectF(
+                    bulleJoueur2.x - bulleJoueur2.rayon,
+                    bulleJoueur2.y - bulleJoueur2.rayon,
+                    bulleJoueur2.x + bulleJoueur2.rayon,
+                    bulleJoueur2.y + bulleJoueur2.rayon
+            );
+            canvas.drawBitmap(imgBulle, null, positionBulleJ2, null);
+        }
+
+        // =======================================================================
+        // 5. TABLEAU D'AFFICHAGE (Noms aux extrémités, Scores au centre)
+        // =======================================================================
+        float positionYTextes = 80f;
+        float margeExtremite = largeur * 0.10f;
+        float ecartScore = 120f;
+
+        // --- JOUEUR GAUCHE ---
+        canvas.drawText(nomJoueurGau, margeExtremite, positionYTextes, pinceauTexteContour);
+        canvas.drawText(nomJoueurGau, margeExtremite, positionYTextes, pinceauTexteJaune);
+
+        // --- JOUEUR DROIT ---
+        canvas.drawText(nomJoueurDro, largeur - margeExtremite, positionYTextes, pinceauTexteContour);
+        canvas.drawText(nomJoueurDro, largeur - margeExtremite, positionYTextes, pinceauTexteJaune);
+
+        // --- SCORES (Applique le même effet Cherry Bomb Jaune et Blanc) ---
+        canvas.drawText(String.valueOf(scoreJoueurGau), centreX - ecartScore, positionYTextes + 15f, pinceauTexteContour);
+        canvas.drawText(String.valueOf(scoreJoueurGau), centreX - ecartScore, positionYTextes + 15f, pinceauTexteJaune);
+
+        canvas.drawText(String.valueOf(scoreJoueurDro), centreX + ecartScore, positionYTextes + 15f, pinceauTexteContour);
+        canvas.drawText(String.valueOf(scoreJoueurDro), centreX + ecartScore, positionYTextes + 15f, pinceauTexteJaune);
     }
 }

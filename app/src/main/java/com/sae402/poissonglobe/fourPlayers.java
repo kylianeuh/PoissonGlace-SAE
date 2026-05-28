@@ -42,10 +42,8 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         spinnerJ3.setAdapter(adapter);
         spinnerJ4.setAdapter(adapter);
 
-        // Charger les pseudos
         refreshSpinners();
 
-        // Listener commun pour ouvrir le dialogue de création
         View.OnClickListener openDialogListener = v ->{
             AddUserDialogFragment dialog = new AddUserDialogFragment();
             dialog.show(getChildFragmentManager(), "AddUser");

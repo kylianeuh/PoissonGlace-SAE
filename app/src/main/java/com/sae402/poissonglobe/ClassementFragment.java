@@ -27,15 +27,11 @@ public class ClassementFragment extends Fragment {
 
         rvClassement = view.findViewById(R.id.rvClassement);
 
-        // CORRECTION 1 : On s'assure que le LayoutManager est bien configuré en Java aussi
         rvClassement.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // On initialise l'adapter avec notre liste de joueurs
         adapter = new ClassementAdapter(listeJoueurs);
         rvClassement.setAdapter(adapter);
 
-        // CORRECTION 2 : Si des joueurs ont été envoyés avant que la vue ne soit prête,
-        // on force l'affichage maintenant qu'elle l'est !
         if (!listeJoueurs.isEmpty()) {
             adapter.notifyDataSetChanged();
         }
@@ -43,16 +39,12 @@ public class ClassementFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Reçoit la liste des joueurs, la trie du plus grand au plus petit score,
-     * et rafraîchit l'affichage du tableau.
-     */
+
     public void majListeJoueurs(List<Joueur> nouveauxJoueurs) {
         if (nouveauxJoueurs != null) {
             this.listeJoueurs.clear();
             this.listeJoueurs.addAll(nouveauxJoueurs);
 
-            // Tri automatique décroissant
             Collections.sort(this.listeJoueurs, new Comparator<Joueur>() {
                 @Override
                 public int compare(Joueur j1, Joueur j2) {
@@ -60,7 +52,6 @@ public class ClassementFragment extends Fragment {
                 }
             });
 
-            // Si l'interface est déjà prête, on redessine tout de suite
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }

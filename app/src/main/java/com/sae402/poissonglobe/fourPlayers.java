@@ -178,4 +178,8 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         }
         return 0; // Par défaut si la base est trop petite
     }
+    public Spinner getSpinnerJ1() { return spinnerJ1; }
+    public Spinner getSpinnerJ2() { return spinnerJ2; }
+    public Spinner getSpinnerJ3() { return spinnerJ3; }
+    public Spinner getSpinnerJ4() { return spinnerJ4; }
 }

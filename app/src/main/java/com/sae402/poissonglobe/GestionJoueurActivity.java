@@ -35,6 +35,23 @@ public class GestionJoueurActivity extends AppCompatActivity{
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(GestionJoueurActivity.this, Jeu.class);
+                    intent.putExtra("NB_JOUEURS", nbJoueurs);
+
+                    if (nbJoueurs == 4) {
+                        fourPlayers frag = (fourPlayers) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                        if (frag != null) {
+                            intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");
+                            intent.putExtra("J2_NOM", frag.getSpinnerJ2().getSelectedItem() != null ? frag.getSpinnerJ2().getSelectedItem().toString() : "Joueur 2");
+                            intent.putExtra("J3_NOM", frag.getSpinnerJ3().getSelectedItem() != null ? frag.getSpinnerJ3().getSelectedItem().toString() : "Joueur 3");
+                            intent.putExtra("J4_NOM", frag.getSpinnerJ4().getSelectedItem() != null ? frag.getSpinnerJ4().getSelectedItem().toString() : "Joueur 4");
+                        }
+                    } else {
+                        twoPlayers frag = (twoPlayers) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                        if (frag != null) {
+                            intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");
+                            intent.putExtra("J2_NOM", frag.getSpinnerJ2().getSelectedItem() != null ? frag.getSpinnerJ2().getSelectedItem().toString() : "Joueur 2");
+                        }
+                    }
                     startActivity(intent);
                 }
             });

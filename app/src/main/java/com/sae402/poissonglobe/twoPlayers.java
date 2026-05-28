@@ -148,6 +148,7 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
     }
-
+    public Spinner getSpinnerJ1() { return spinnerJ1; }
+    public Spinner getSpinnerJ2() { return spinnerJ2; }
 
 }

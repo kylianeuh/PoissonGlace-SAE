@@ -14,7 +14,9 @@ public class GestionJoueurActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gestion_joueur);
 
-        int nbJoueurs = getIntent().getIntExtra("NB_JOUEURS", 2);Fragment fragmentChoisi;
+        int nbJoueurs = getIntent().getIntExtra("NB_JOUEURS", 2);
+        Fragment fragmentChoisi;
+
         if (nbJoueurs == 4) {
             fragmentChoisi = new fourPlayers();
         } else {

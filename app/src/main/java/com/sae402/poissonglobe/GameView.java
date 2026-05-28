@@ -21,23 +21,23 @@ public class GameView extends View {
     // =======================================================================
 
     // --- LE POISSON GLOBE ---
-    public static float FACTEUR_TAILLE_POISSON = 0.08f;    // Taille de l'image (proportionnelle à la hauteur de l'écran)
-    public static float CONFIG_HITBOX_POISSON_RAYON = 0.70f; // Multiplicateur de la hitbox (1.0 = taille de l'image)
-    public static float CONFIG_HITBOX_POISSON_DECALAGE_X = 10f; // Décale la hitbox vers la droite (+) ou gauche (-)
-    public static float CONFIG_HITBOX_POISSON_DECALAGE_Y = 0f; // Décale la hitbox vers le bas (+) ou le haut (-)
+    public static float FACTEUR_TAILLE_POISSON = 0.08f;
+    public static float CONFIG_HITBOX_POISSON_RAYON = 0.70f;
+    public static float CONFIG_HITBOX_POISSON_DECALAGE_X = 10f;
+    public static float CONFIG_HITBOX_POISSON_DECALAGE_Y = 0f;
 
     // --- LES JOUEURS (BULLES) ---
-    public static float FACTEUR_TAILLE_BULLE = 0.05f; // Règle le diamètre visuel global (ex: 0.10f pour plus petit)
-    public static float CONFIG_HITBOX_BULLE_RAYON = 1.0f; // 1.0f signifie que la ligne se calera PILE sur le contour
+    public static float FACTEUR_TAILLE_BULLE = 0.05f;
+    public static float CONFIG_HITBOX_BULLE_RAYON = 1.0f;
     public static float CONFIG_HITBOX_BULLE_DECALAGE_X = 0f;
     public static float CONFIG_HITBOX_BULLE_DECALAGE_Y = 0f;
 
     // --- CONSTANTES DE JEU ---
-    public static float FRICTION_TERRAIN = 0.98f;          // Glisse du poisson (1.0 = pas de fin, 0.90 = s'arrête très vite)
-    public static float CONFIG_RESTITUTION = 0.5f;          // Amorti (0.0 = pas de rebond autonome, 1.0 = rebond parfait style billard)
-    public static float CONFIG_MULT_FORCE_DOIGT = 1.2f;     // Multiplicateur de la force de ton geste
-    public static float CONFIG_VITESSE_MIN_DOIGT = 0.5f;    // Seuil en-dessous duquel le jeu ignore la vitesse du doigt
-    public static float CONFIG_VITESSE_MAX_POISSON = 45f;    // Vitesse max autorisée pour le poisson (anti-transpercement)
+    public static float FRICTION_TERRAIN = 0.98f;
+    public static float CONFIG_RESTITUTION = 0.5f;
+    public static float CONFIG_MULT_FORCE_DOIGT = 1.2f;
+    public static float CONFIG_VITESSE_MIN_DOIGT = 0.5f;
+    public static float CONFIG_VITESSE_MAX_POISSON = 45f;
     public static int PHYSIQUE_SUB_STEPS = 3;
 
     private Paint pinceauLignes;
@@ -92,9 +92,21 @@ public class GameView extends View {
     private int idDoigtJ1 = -1;
     private int idDoigtJ2 = -1;
 
+    // pour terminer la partie
+    private boolean partieTerminee = false;
+
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialiserTerrain(context);
+    }
+
+    public interface OnGameOverListener {
+        void onGameOver(String pseudoVainqueur);
+    }
+    private OnGameOverListener gameOverListener;
+
+    public void setOnGameOverListener(OnGameOverListener listener) {
+        this.gameOverListener = listener;
     }
 
     private void initialiserTerrain(Context context) {
@@ -287,6 +299,19 @@ public class GameView extends View {
         drawTextWithContour(canvas, nomJoueurDro, getWidth() - margeExtremite, positionYTextes);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurGau), centreX - ecartScore, correctionYScore);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurDro), centreX + ecartScore, correctionYScore);
+
+        if (!partieTerminee) {
+            if (scoreJoueurGau >= 6 || scoreJoueurDro >= 6) {
+                partieTerminee = true; // On bloque le jeu pour arrêter les futurs mouvements
+
+                String vainqueur = (scoreJoueurGau >= 6) ? nomJoueurGau : nomJoueurDro;
+
+                // On prévient l'activité en lui donnant le nom du gagnant
+                if (gameOverListener != null) {
+                    gameOverListener.onGameOver(vainqueur);
+                }
+            }
+        }
     }
 
     private void drawTextWithContour(Canvas canvas, String text, float x, float y) {

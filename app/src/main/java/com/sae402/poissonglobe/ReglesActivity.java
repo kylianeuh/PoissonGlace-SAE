@@ -11,7 +11,7 @@ public class ReglesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.regles);
-        View btnRetour = findViewById(R.id.btnRetour);
+        View btnRetour = findViewById(R.id.btnRetourDetails);
 
         btnRetour.setOnClickListener(new View.OnClickListener() {
             @Override

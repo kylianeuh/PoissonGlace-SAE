@@ -9,40 +9,38 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
 public class GameView extends View {
 
-    private Paint pinceauLignes;
-    private Paint pinceauButs;
+    private Paint pinceauLignes, pinceauButs;
+    private Paint pinceauTexteJaune, pinceauTexteContour;
+    private Paint pinceauBoutonPause, pinceauBoutonPauseBordure, pinceauSymbolePause, pinceauSymbolePauseBordure;
 
-    // Nos pinceaux pour les textes (style PoissonGlaceTextView)
-    private Paint pinceauTexteJaune;
-    private Paint pinceauTexteContour;
-
-    // Les données de match (Le "Back" de l'arbitrage)
-    public String nomJoueurGau = "Joueur 1";
-    public String nomJoueurDro = "Joueur 2";
-    public int scoreJoueurGau = 0;
-    public int scoreJoueurDro = 0;
-
-    // Repères du terrain
     public float ligneCentraleX, centreX, centreY;
     public float rayonCercleCentral, limiteSableGauche, limiteSableDroite;
-    public RectF rectangleButGauche, rectangleButDroite;
+    private float pauseBtnX, pauseBtnY, pauseBtnRadius;
 
-    // --- NOS OBJETS DE JEU (BACK) ---
+    private final RectF rectangleButGauche = new RectF();
+    private final RectF rectangleButDroite = new RectF();
+    private final RectF zoneButGauche = new RectF();
+    private final RectF zoneButDroit = new RectF();
+    private final RectF pauseBarLeft = new RectF();
+    private final RectF pauseBarRight = new RectF();
+    private final RectF positionAsset = new RectF();
+
+    public String nomJoueurGau = "Joueur 1", nomJoueurDro = "Joueur 2";
+    public int scoreJoueurGau = 0, scoreJoueurDro = 0;
+
     public PoissonGlobe poissonGlobe;
-    public Bulle bulleJoueur1; // Joueur Gauche
-    public Bulle bulleJoueur2; // Joueur Droit
+    public Bulle bulleJoueur1, bulleJoueur2;
+    private Bitmap imgPoissonGlobe, imgBulle;
 
-    // --- NOS ASSETS GRAPHIQUES ---
-    private Bitmap imgPoissonGlobe;
-    private Bitmap imgBulle;
-
-    private boolean initialisationFaite = false;
+    private float positionYTextes, margeExtremite, ecartScore, correctionYScore;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -50,156 +48,135 @@ public class GameView extends View {
     }
 
     private void initialiserTerrain(Context context) {
-        pinceauLignes = new Paint();
-        pinceauLignes.setColor(Color.WHITE);
-        pinceauLignes.setStyle(Paint.Style.STROKE);
-        pinceauLignes.setStrokeWidth(12f);
-        pinceauLignes.setAntiAlias(true);
+        pinceauLignes = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
+        pinceauButs = createPaint(Color.parseColor("#5C4033"), Paint.Style.FILL, 0f);
 
-        pinceauButs = new Paint();
-        pinceauButs.setColor(Color.parseColor("#5C4033"));
-        pinceauButs.setStyle(Paint.Style.FILL);
-
-        // On récupère la police Cherry Bomb
         Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
 
-        // CONTOUR BLANC : On baisse l'épaisseur pour éviter qu'il n'étouffe le centre
-        pinceauTexteContour = new Paint();
+        pinceauTexteContour = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
         pinceauTexteContour.setTypeface(typoCherry);
-        pinceauTexteContour.setColor(Color.WHITE);
-        pinceauTexteContour.setTextSize(65f); // Légèrement plus grand pour englober
-        pinceauTexteContour.setStyle(Paint.Style.STROKE);
-        pinceauTexteContour.setStrokeWidth(12f); // Épaisseur réduite (12 au lieu de 20) pour libérer le jaune
+        pinceauTexteContour.setTextSize(65f);
         pinceauTexteContour.setStrokeJoin(Paint.Join.ROUND);
-        pinceauTexteContour.setAntiAlias(true);
         pinceauTexteContour.setTextAlign(Paint.Align.CENTER);
 
-// INTÉRIEUR JAUNE : On le passe en FILL pur et on augmente sa taille !
-        pinceauTexteJaune = new Paint();
+        pinceauTexteJaune = createPaint(Color.parseColor("#FFCC00"), Paint.Style.FILL, 0f);
         pinceauTexteJaune.setTypeface(typoCherry);
-        pinceauTexteJaune.setColor(Color.parseColor("#FFCC00"));
-        pinceauTexteJaune.setTextSize(65f); // Même taille de base que le contour
-        pinceauTexteJaune.setStyle(Paint.Style.FILL); // FILL pur pour éviter les conflits de tracés
-        pinceauTexteJaune.setAntiAlias(true);
+        pinceauTexteJaune.setTextSize(65f);
         pinceauTexteJaune.setTextAlign(Paint.Align.CENTER);
 
-        rectangleButGauche = new RectF();
-        rectangleButDroite = new RectF();
+        pinceauBoutonPause = createPaint(Color.parseColor("#6622A7F0"), Paint.Style.FILL, 0f);
+        pinceauBoutonPauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 8f);
+        pinceauSymbolePause = createPaint(Color.parseColor("#FFCC00"), Paint.Style.FILL, 0f);
 
-        // CHARGEMENT DE TES IMAGES
+        pinceauSymbolePauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
+        pinceauSymbolePauseBordure.setStrokeJoin(Paint.Join.ROUND);
+
         imgPoissonGlobe = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_brown);
         imgBulle = BitmapFactory.decodeResource(context.getResources(), R.drawable.bubble_c);
+    }
+
+    private Paint createPaint(int color, Paint.Style style, float strokeWidth) {
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(color);
+        p.setStyle(style);
+        if (strokeWidth > 0) p.setStrokeWidth(strokeWidth);
+        return p;
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        centreX = w / 2f;
+        centreY = h / 2f;
+        ligneCentraleX = centreX;
+        limiteSableGauche = w * 0.10f;
+        limiteSableDroite = w - limiteSableGauche;
+
+        poissonGlobe = new PoissonGlobe(centreX, centreY, h * 0.08f);
+        bulleJoueur1 = new Bulle(w * 0.20f, centreY, h * 0.13f);
+        bulleJoueur2 = new Bulle(w * 0.80f, centreY, h * 0.13f);
+
+        float hauteurBut = h / 3f;
+        float epaisseurBut = 40f;
+        float rayonZoneBut = h * 0.22f;
+
+        rectangleButGauche.set(0, centreY - (hauteurBut / 2f), epaisseurBut, centreY + (hauteurBut / 2f));
+        rectangleButDroite.set(w - epaisseurBut, centreY - (hauteurBut / 2f), w, centreY + (hauteurBut / 2f));
+
+        rayonCercleCentral = h * 0.09f;
+        zoneButGauche.set(-rayonZoneBut, centreY - rayonZoneBut, rayonZoneBut, centreY + rayonZoneBut);
+        zoneButDroit.set(w - rayonZoneBut, centreY - rayonZoneBut, w + rayonZoneBut, centreY + rayonZoneBut);
+
+        pauseBtnRadius = h * 0.04f;
+        pauseBtnX = centreX;
+        pauseBtnY = h - pauseBtnRadius - 40f;
+
+        float barWidth = pauseBtnRadius * 0.25f, barHeight = pauseBtnRadius * 0.8f, barSpacing = pauseBtnRadius * 0.2f;
+        pauseBarLeft.set(pauseBtnX - barSpacing / 2f - barWidth, pauseBtnY - barHeight / 2f, pauseBtnX - barSpacing / 2f, pauseBtnY + barHeight / 2f);
+        pauseBarRight.set(pauseBtnX + barSpacing / 2f, pauseBtnY - barHeight / 2f, pauseBtnX + barSpacing / 2f + barWidth, pauseBtnY + barHeight / 2f);
+
+        positionYTextes = 80f;
+        margeExtremite = w * 0.10f;
+        ecartScore = 120f;
+        correctionYScore = positionYTextes + 15f;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int largeur = getWidth();
-        int hauteur = getHeight();
-
-        // =======================================================================
-        // 1. CALCULS DES REPERES DU TERRAIN (Si pas encore fait)
-        // =======================================================================
-        if (!initialisationFaite) {
-            centreX = largeur / 2f;
-            centreY = hauteur / 2f;
-            ligneCentraleX = centreX;
-            limiteSableGauche = largeur * 0.10f;
-            limiteSableDroite = largeur - (largeur * 0.10f);
-
-            // Création des objets au centre de leurs zones respectives
-            float rayonPoisson = hauteur * 0.08f;
-            float rayonBulle = hauteur * 0.13f;
-
-            poissonGlobe = new PoissonGlobe(centreX, centreY, rayonPoisson);
-            bulleJoueur1 = new Bulle(largeur * 0.20f, centreY, rayonBulle); // Positionné dans son camp gauche
-            bulleJoueur2 = new Bulle(largeur * 0.80f, centreY, rayonBulle); // Positionné dans son camp droit
-
-            initialisationFaite = true;
-        }
-
-        float hauteurBut = hauteur / 3f;
-        float epaisseurBut = 40f;
-
-        // =======================================================================
-        // 2. DESSIN DES BUTS MARRONS
-        // =======================================================================
-        rectangleButGauche.set(0, centreY - (hauteurBut / 2f), epaisseurBut, centreY + (hauteurBut / 2f));
-        rectangleButDroite.set(largeur - epaisseurBut, centreY - (hauteurBut / 2f), largeur, centreY + (hauteurBut / 2f));
         canvas.drawRect(rectangleButGauche, pinceauButs);
         canvas.drawRect(rectangleButDroite, pinceauButs);
-
-        // =======================================================================
-        // 3. DESSIN DES LIGNES BLANCHES
-        // =======================================================================
-        canvas.drawLine(ligneCentraleX, 0, ligneCentraleX, hauteur, pinceauLignes);
-        rayonCercleCentral = hauteur * 0.09f;
+        canvas.drawLine(ligneCentraleX, 0, ligneCentraleX, getHeight(), pinceauLignes);
         canvas.drawCircle(centreX, centreY, rayonCercleCentral, pinceauLignes);
-
-        float rayonZoneBut = hauteur * 0.22f;
-        RectF zoneButGauche = new RectF(-rayonZoneBut, centreY - rayonZoneBut, rayonZoneBut, centreY + rayonZoneBut);
         canvas.drawArc(zoneButGauche, 270, 180, false, pinceauLignes);
-
-        RectF zoneButDroit = new RectF(largeur - rayonZoneBut, centreY - rayonZoneBut, largeur + rayonZoneBut, centreY + rayonZoneBut);
         canvas.drawArc(zoneButDroit, 90, 180, false, pinceauLignes);
 
-        // =======================================================================
-        // 4. DESSIN DES ASSETS (Poisson-Globe et Bulles)
-        // =======================================================================
-
-        // Dessin du Palet (Poisson Globe) centré sur ses coordonnées (x,y)
         if (imgPoissonGlobe != null) {
-            RectF positionPoisson = new RectF(
-                    poissonGlobe.x - poissonGlobe.rayon,
-                    poissonGlobe.y - poissonGlobe.rayon,
-                    poissonGlobe.x + poissonGlobe.rayon,
-                    poissonGlobe.y + poissonGlobe.rayon
-            );
-            canvas.drawBitmap(imgPoissonGlobe, null, positionPoisson, null);
+            positionAsset.set(poissonGlobe.x - poissonGlobe.rayon, poissonGlobe.y - poissonGlobe.rayon, poissonGlobe.x + poissonGlobe.rayon, poissonGlobe.y + poissonGlobe.rayon);
+            canvas.drawBitmap(imgPoissonGlobe, null, positionAsset, null);
         }
-
-        // Dessin des Bulles
         if (imgBulle != null) {
-            // Dessin de la Bulle du Joueur 1 (Gauche)
-            RectF positionBulleJ1 = new RectF(
-                    bulleJoueur1.x - bulleJoueur1.rayon,
-                    bulleJoueur1.y - bulleJoueur1.rayon,
-                    bulleJoueur1.x + bulleJoueur1.rayon,
-                    bulleJoueur1.y + bulleJoueur1.rayon
-            );
-            canvas.drawBitmap(imgBulle, null, positionBulleJ1, null);
+            positionAsset.set(bulleJoueur1.x - bulleJoueur1.rayon, bulleJoueur1.y - bulleJoueur1.rayon, bulleJoueur1.x + bulleJoueur1.rayon, bulleJoueur1.y + bulleJoueur1.rayon);
+            canvas.drawBitmap(imgBulle, null, positionAsset, null);
 
-            // Dessin de la Bulle du Joueur 2 (Droite)
-            RectF positionBulleJ2 = new RectF(
-                    bulleJoueur2.x - bulleJoueur2.rayon,
-                    bulleJoueur2.y - bulleJoueur2.rayon,
-                    bulleJoueur2.x + bulleJoueur2.rayon,
-                    bulleJoueur2.y + bulleJoueur2.rayon
-            );
-            canvas.drawBitmap(imgBulle, null, positionBulleJ2, null);
+            positionAsset.set(bulleJoueur2.x - bulleJoueur2.rayon, bulleJoueur2.y - bulleJoueur2.rayon, bulleJoueur2.x + bulleJoueur2.rayon, bulleJoueur2.y + bulleJoueur2.rayon);
+            canvas.drawBitmap(imgBulle, null, positionAsset, null);
         }
 
-        // =======================================================================
-        // 5. TABLEAU D'AFFICHAGE (Noms aux extrémités, Scores au centre)
-        // =======================================================================
-        float positionYTextes = 80f;
-        float margeExtremite = largeur * 0.10f;
-        float ecartScore = 120f;
+        canvas.drawCircle(pauseBtnX, pauseBtnY, pauseBtnRadius, pinceauBoutonPause);
+        canvas.drawCircle(pauseBtnX, pauseBtnY, pauseBtnRadius, pinceauBoutonPauseBordure);
+        canvas.drawRect(pauseBarLeft, pinceauSymbolePauseBordure);
+        canvas.drawRect(pauseBarRight, pinceauSymbolePauseBordure);
+        canvas.drawRect(pauseBarLeft, pinceauSymbolePause);
+        canvas.drawRect(pauseBarRight, pinceauSymbolePause);
 
-        // --- JOUEUR GAUCHE ---
-        canvas.drawText(nomJoueurGau, margeExtremite, positionYTextes, pinceauTexteContour);
-        canvas.drawText(nomJoueurGau, margeExtremite, positionYTextes, pinceauTexteJaune);
+        drawTextWithContour(canvas, nomJoueurGau, margeExtremite, positionYTextes);
+        drawTextWithContour(canvas, nomJoueurDro, getWidth() - margeExtremite, positionYTextes);
+        drawTextWithContour(canvas, String.valueOf(scoreJoueurGau), centreX - ecartScore, correctionYScore);
+        drawTextWithContour(canvas, String.valueOf(scoreJoueurDro), centreX + ecartScore, correctionYScore);
+    }
 
-        // --- JOUEUR DROIT ---
-        canvas.drawText(nomJoueurDro, largeur - margeExtremite, positionYTextes, pinceauTexteContour);
-        canvas.drawText(nomJoueurDro, largeur - margeExtremite, positionYTextes, pinceauTexteJaune);
+    private void drawTextWithContour(Canvas canvas, String text, float x, float y) {
+        canvas.drawText(text, x, y, pinceauTexteContour);
+        canvas.drawText(text, x, y, pinceauTexteJaune);
+    }
 
-        // --- SCORES (Applique le même effet Cherry Bomb Jaune et Blanc) ---
-        canvas.drawText(String.valueOf(scoreJoueurGau), centreX - ecartScore, positionYTextes + 15f, pinceauTexteContour);
-        canvas.drawText(String.valueOf(scoreJoueurGau), centreX - ecartScore, positionYTextes + 15f, pinceauTexteJaune);
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            float dx = event.getX() - pauseBtnX;
+            float dy = event.getY() - pauseBtnY;
+            if ((dx * dx + dy * dy) <= (pauseBtnRadius * pauseBtnRadius)) {
+                declencherPause();
+                return true;
+            }
+        }
+        return super.onTouchEvent(event);
+    }
 
-        canvas.drawText(String.valueOf(scoreJoueurDro), centreX + ecartScore, positionYTextes + 15f, pinceauTexteContour);
-        canvas.drawText(String.valueOf(scoreJoueurDro), centreX + ecartScore, positionYTextes + 15f, pinceauTexteJaune);
+    private void declencherPause() {
+        // Code de pause
     }
 }

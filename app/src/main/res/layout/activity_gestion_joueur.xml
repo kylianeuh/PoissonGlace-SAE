@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A4E2FC"
-    android:padding="16dp">
+    android:background="#A4E2FC">
 
     <include
         layout="@layout/fond_complet"
@@ -17,12 +16,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- TITRE -->
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/txtTitre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Poisson Glace"
+        android:fontFamily="@font/cherry_bomb"
         android:textColor="#FFD700"
         android:textSize="54sp"
         android:textStyle="bold"
@@ -30,15 +30,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- BOUTON RETOUR -->
     <com.sae402.poissonglobe.PoissonGlaceTextView
-        android:id="@+id/btnRetour"
-        android:layout_width="81dp"
-        android:layout_height="80dp"
-        android:background="@drawable/bouton_rond_bordure"
+        android:id="@+id/btnRetourDetails"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/cherry_bomb"
         android:gravity="center"
         android:text="Retour"
         android:textColor="#FFD700"
+        android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,6 +55,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/btnCommencer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,14 +64,20 @@
     <!-- BOUTON COMMENCER -->
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/btnCommencer"
-        android:layout_width="161dp"
-        android:layout_height="73dp"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="764dp"
+        android:layout_marginTop="464dp"
         android:background="@drawable/bouton_arrondi_bordure"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/cherry_bomb"
         android:gravity="center"
         android:text="Commencer"
         android:textColor="#FFD700"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

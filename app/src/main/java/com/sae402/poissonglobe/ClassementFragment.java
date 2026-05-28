@@ -39,6 +39,7 @@ public class ClassementFragment extends Fragment {
         return view;
     }
 
+
     public void majListeJoueurs(List<Joueur> nouveauxJoueurs) {
         if (nouveauxJoueurs != null) {
             this.listeJoueurs.clear();

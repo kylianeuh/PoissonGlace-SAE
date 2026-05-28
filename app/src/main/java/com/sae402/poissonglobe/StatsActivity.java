@@ -17,26 +17,22 @@ public class StatsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Initialisation propre de Room
         AppDatabase db = AppDatabase.getAppDatabase(this);
         jeuDAO = db.getJeuDAO();
 
-        // 2. Récupération des vrais joueurs de ta table
         listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
 
-        // 3. Affichage de l'écran de sélection
         chargerVueSelection();
     }
 
     private void chargerVueSelection() {
         setContentView(R.layout.stats_selection);
 
-        View btnRetour = findViewById(R.id.btnRetourSelection);
+        View btnRetour = findViewById(R.id.btnRetourDetails);
         btnRetour.setOnClickListener(v -> finish());
 
         RecyclerView rvChoixJoueurs = findViewById(R.id.rvChoixJoueurs);
 
-        // On passe la liste de JoueurBD à l'adapter de sélection
         SelectionJoueursAdapter adapterSelection = new SelectionJoueursAdapter(listeGlobaleJoueurs, new SelectionJoueursAdapter.OnJoueurClickListener() {
             @Override
             public void onJoueurClick(String nomClique) {

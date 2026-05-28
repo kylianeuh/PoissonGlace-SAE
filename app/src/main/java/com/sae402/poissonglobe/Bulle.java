@@ -3,7 +3,6 @@ package com.sae402.poissonglobe;
 public class Bulle {
     public float x, y;
     public float rayon;
-
     public float vX = 0f;
     public float vY = 0f;
     private float derniereX, derniereY;

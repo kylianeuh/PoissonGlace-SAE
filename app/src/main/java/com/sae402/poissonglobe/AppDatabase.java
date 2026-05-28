@@ -33,9 +33,9 @@ import com.sae402.poissonglobe.PartieBD;
     private static void initialiserDonneesParDefaut() {
         if (bddInstance.getJeuDAO().getAllJoueurs().isEmpty()) {
             bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Kylian"));
-            bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Adversaire"));
-            bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Adversaire2"));
-            bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Adversaire3"));
+            bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Lindsay"));
+            bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Maxime"));
+            bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Ludwig"));
         }
     }
 }

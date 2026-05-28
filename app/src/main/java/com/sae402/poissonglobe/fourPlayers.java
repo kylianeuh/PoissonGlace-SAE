@@ -125,7 +125,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 String joueurSelectionne = parent.getItemAtPosition(position).toString();
-                // On lance la vérification en passant le Spinner qui vient de changer
                 verifierDoublon((android.widget.Spinner) parent, joueurSelectionne);
             }
 

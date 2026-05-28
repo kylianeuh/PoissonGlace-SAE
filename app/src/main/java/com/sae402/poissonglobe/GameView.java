@@ -20,25 +20,25 @@ public class GameView extends View {
     // --- CONFIGURATION GLOBALE ET CALIBRATION DE LA PHYSIQUE (STATIC) ---
     // =======================================================================
 
-    // --- LE POISSON GLOBE ---
-    public static float FACTEUR_TAILLE_POISSON = 0.08f;    // Taille de l'image (proportionnelle à la hauteur de l'écran)
-    public static float CONFIG_HITBOX_POISSON_RAYON = 0.70f; // Multiplicateur de la hitbox (1.0 = taille de l'image)
-    public static float CONFIG_HITBOX_POISSON_DECALAGE_X = 10f; // Décale la hitbox vers la droite (+) ou gauche (-)
-    public static float CONFIG_HITBOX_POISSON_DECALAGE_Y = 0f; // Décale la hitbox vers le bas (+) ou le haut (-)
+    public static float FACTEUR_TAILLE_POISSON = 0.08f;
+    public static float CONFIG_HITBOX_POISSON_RAYON = 0.70f;
+    public static float CONFIG_HITBOX_POISSON_DECALAGE_X = 10f;
+    public static float CONFIG_HITBOX_POISSON_DECALAGE_Y = 0f;
 
-    // --- LES JOUEURS (BULLES) ---
-    public static float FACTEUR_TAILLE_BULLE = 0.05f; // Règle le diamètre visuel global (ex: 0.10f pour plus petit)
-    public static float CONFIG_HITBOX_BULLE_RAYON = 1.0f; // 1.0f signifie que la ligne se calera PILE sur le contour
+    public static float FACTEUR_TAILLE_BULLE = 0.05f;
+    public static float CONFIG_HITBOX_BULLE_RAYON = 1.0f;
     public static float CONFIG_HITBOX_BULLE_DECALAGE_X = 0f;
     public static float CONFIG_HITBOX_BULLE_DECALAGE_Y = 0f;
 
-    // --- CONSTANTES DE JEU ---
-    public static float FRICTION_TERRAIN = 0.98f;          // Glisse du poisson (1.0 = pas de fin, 0.90 = s'arrête très vite)
-    public static float CONFIG_RESTITUTION = 0.5f;          // Amorti (0.0 = pas de rebond autonome, 1.0 = rebond parfait style billard)
-    public static float CONFIG_MULT_FORCE_DOIGT = 1.2f;     // Multiplicateur de la force de ton geste
-    public static float CONFIG_VITESSE_MIN_DOIGT = 0.5f;    // Seuil en-dessous duquel le jeu ignore la vitesse du doigt
-    public static float CONFIG_VITESSE_MAX_POISSON = 45f;    // Vitesse max autorisée pour le poisson (anti-transpercement)
+    public static float FRICTION_TERRAIN = 0.98f;
+    public static float CONFIG_RESTITUTION = 0.5f;
+    public static float CONFIG_MULT_FORCE_DOIGT = 1.2f;
+    public static float CONFIG_VITESSE_MIN_DOIGT = 0.5f;
+    public static float CONFIG_VITESSE_MAX_POISSON = 45f;
     public static int PHYSIQUE_SUB_STEPS = 3;
+
+    // Configuration dynamique du nombre de joueurs (Reçu de l'Activity)
+    public int nombreDeJoueursConfig = 2;
 
     private Paint pinceauLignes;
     private Paint pinceauButs;
@@ -49,36 +49,37 @@ public class GameView extends View {
     private Paint pinceauSymbolePause;
     private Paint pinceauSymbolePauseBordure;
 
-    // Pinceaux pour les textes (style PoissonGlaceTextView)
     private Paint pinceauTexteJaune;
     private Paint pinceauTexteContour;
 
-    // Les données de match (Le "Back" de l'arbitrage)
+    // Noms des joueurs (J1 & J3 à Gauche, J2 & J4 à Droite)
     public String nomJoueurGau = "Joueur 1";
     public String nomJoueurDro = "Joueur 2";
+    public String nomJoueurGau2 = "Joueur 3";
+    public String nomJoueurDro2 = "Joueur 4";
+
     public int scoreJoueurGau = 0;
     public int scoreJoueurDro = 0;
 
     public float ligneCentraleX, centreX, centreY;
     public float rayonCercleCentral, limiteSableGauche, limiteSableDroite;
 
-    // Objets graphiques du terrain
     private RectF rectangleButGauche;
     private RectF rectangleButDroite;
     private RectF zoneButGauche;
     private RectF zoneButDroit;
 
-    // Éléments du bouton pause
     private float pauseBtnX, pauseBtnY, pauseBtnRadius;
     private RectF pauseBarLeft;
     private RectF pauseBarRight;
 
-    // --- OBJETS DE JEU (BACK) ---
+    // --- OBJETS DE JEU (4 Joueurs possibles) ---
     public PoissonGlobe poissonGlobe;
-    public Bulle bulleJoueur1; // Joueur Gauche
-    public Bulle bulleJoueur2; // Joueur Droit
+    public Bulle bulleJoueur1; // Gauche (Attaquant / Principal)
+    public Bulle bulleJoueur2; // Droite (Attaquant / Principal)
+    public Bulle bulleJoueur3; // Gauche 2 (Défenseur en 2v2)
+    public Bulle bulleJoueur4; // Droite 2 (Défenseur en 2v2)
 
-    // --- ASSETS GRAPHIQUES ---
     private Bitmap imgPoissonGlobe;
 
     private float positionYTextes, margeExtremite, ecartScore, correctionYScore;
@@ -88,9 +89,11 @@ public class GameView extends View {
     private Runnable boucleJeu;
     private final int FPS = 60;
 
-    // Suivre l'ID du pointeur (doigt) qui contrôle chaque bulle (Multitouch)
+    // Tracking Multi-doigts pour les 4 joueurs (-1 = aucun doigt)
     private int idDoigtJ1 = -1;
     private int idDoigtJ2 = -1;
+    private int idDoigtJ3 = -1;
+    private int idDoigtJ4 = -1;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -101,7 +104,6 @@ public class GameView extends View {
         pinceauLignes = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
         pinceauButs = createPaint(Color.parseColor("#5C4033"), Paint.Style.FILL, 0f);
 
-        // police Cherry Bomb
         Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
 
         pinceauTexteContour = new Paint();
@@ -144,14 +146,14 @@ public class GameView extends View {
                 if (initialisationFaite) {
                     gererPhysiqueEtArbitrage();
                 }
-                invalidate(); // Force le redessin (onDraw)
+                invalidate();
                 jeuHandler.postDelayed(this, 1000 / FPS);
             }
         };
         jeuHandler.post(boucleJeu);
 
         pinceauBullesJoueurs = new Paint();
-        pinceauBullesJoueurs.setColor(Color.parseColor("#40E0D0"));
+        pinceauBullesJoueurs.setColor(Color.parseColor("#FFFFFF"));
         pinceauBullesJoueurs.setStyle(Paint.Style.STROKE);
         pinceauBullesJoueurs.setStrokeWidth(8f);
         pinceauBullesJoueurs.setAntiAlias(true);
@@ -182,8 +184,12 @@ public class GameView extends View {
         limiteSableDroite = w - limiteSableGauche;
 
         poissonGlobe = new PoissonGlobe(centreX, centreY, h * 0.08f);
-        bulleJoueur1 = new Bulle(w * 0.20f, centreY, h * 0.13f);
-        bulleJoueur2 = new Bulle(w * 0.80f, centreY, h * 0.13f);
+
+        // Initialisation des 4 joueurs (répartis sur le terrain)
+        bulleJoueur1 = new Bulle(w * 0.25f, centreY, h * 0.13f);
+        bulleJoueur2 = new Bulle(w * 0.75f, centreY, h * 0.13f);
+        bulleJoueur3 = new Bulle(w * 0.12f, centreY, h * 0.13f);
+        bulleJoueur4 = new Bulle(w * 0.88f, centreY, h * 0.13f);
 
         float hauteurBut = h / 3f;
         float epaisseurBut = 40f;
@@ -225,20 +231,17 @@ public class GameView extends View {
         canvas.drawArc(zoneButGauche, 270, 180, false, pinceauLignes);
         canvas.drawArc(zoneButDroit, 90, 180, false, pinceauLignes);
 
-        // =======================================================================
-        // 4. DESSIN DES ASSETS (Calculs basés sur les variables Static)
-        // =======================================================================
-
-        // 1. CALCUL DE TOUS LES RAYONS DE BASE VISUELS
+        // 1. MISE À JOUR DES RAYONS
         float rayonVisuelPoisson = hauteur * FACTEUR_TAILLE_POISSON;
         float rayonVisuelBulle = hauteur * FACTEUR_TAILLE_BULLE;
 
-        // 2. CORRECTION CRITIQUE : MISE À JOUR DES RAYONS DES OBJETS AVANT TOUT DESSIN
         poissonGlobe.rayon = rayonVisuelPoisson * CONFIG_HITBOX_POISSON_RAYON;
         bulleJoueur1.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
         bulleJoueur2.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
+        bulleJoueur3.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
+        bulleJoueur4.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
 
-        // --- A. DESSIN DU POISSON (IMAGE) ---
+        // --- A. DESSIN DU POISSON ---
         if (imgPoissonGlobe != null) {
             RectF positionPoisson = new RectF(
                     poissonGlobe.x - rayonVisuelPoisson,
@@ -249,33 +252,33 @@ public class GameView extends View {
             canvas.drawBitmap(imgPoissonGlobe, null, positionPoisson, null);
         }
 
-        // --- B. DESSIN DES JOUEURS (100% VECTORIEL) ---
-        Paint pinceauCorpsBulle = new Paint();
+        // --- B. DESSIN DES BULLES JOUEURS (VECTORIEL) ---
+        Paint pinceauCorpsBulle = new Paint(Paint.ANTI_ALIAS_FLAG);
         pinceauCorpsBulle.setColor(Color.parseColor("#A0E0FF"));
         pinceauCorpsBulle.setStyle(Paint.Style.FILL);
         pinceauCorpsBulle.setAlpha(80);
-        pinceauCorpsBulle.setAntiAlias(true);
 
-        Paint pinceauRefletBulle = new Paint();
+        Paint pinceauRefletBulle = new Paint(Paint.ANTI_ALIAS_FLAG);
         pinceauRefletBulle.setColor(Color.WHITE);
         pinceauRefletBulle.setStyle(Paint.Style.FILL);
         pinceauRefletBulle.setAlpha(180);
-        pinceauRefletBulle.setAntiAlias(true);
 
-        // ---- JOUEUR 1 (GAUCHE) ----
-        canvas.drawCircle(bulleJoueur1.x, bulleJoueur1.y, rayonVisuelBulle, pinceauCorpsBulle);
-        canvas.drawCircle(bulleJoueur1.x, bulleJoueur1.y, rayonVisuelBulle, pinceauBullesJoueurs);
+        float decalageReflet = rayonVisuelBulle * 0.35f;
+        float rayonReflet = rayonVisuelBulle * 0.15f;
 
-        float decalageReflet1 = rayonVisuelBulle * 0.35f;
-        float rayonReflet1 = rayonVisuelBulle * 0.15f;
-        canvas.drawCircle(bulleJoueur1.x - decalageReflet1, bulleJoueur1.y - decalageReflet1, rayonReflet1, pinceauRefletBulle);
+        // Dessin équipe Gauche (Toujours J1, J3 uniquement si mode 2v2)
+        dessinerBulleVectorielle(canvas, bulleJoueur1, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        if (nombreDeJoueursConfig == 4) {
+            dessinerBulleVectorielle(canvas, bulleJoueur3, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        }
 
-        // ---- JOUEUR 2 (DROIT) ----
-        canvas.drawCircle(bulleJoueur2.x, bulleJoueur2.y, rayonVisuelBulle, pinceauCorpsBulle);
-        canvas.drawCircle(bulleJoueur2.x, bulleJoueur2.y, rayonVisuelBulle, pinceauBullesJoueurs);
-        canvas.drawCircle(bulleJoueur2.x - decalageReflet1, bulleJoueur2.y - decalageReflet1, rayonReflet1, pinceauRefletBulle);
+        // Dessin équipe Droite (Toujours J2, J4 uniquement si mode 2v2)
+        dessinerBulleVectorielle(canvas, bulleJoueur2, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        if (nombreDeJoueursConfig == 4) {
+            dessinerBulleVectorielle(canvas, bulleJoueur4, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        }
 
-        // --- C. DESSIN PAUSE & TEXTES ---
+        // --- C. TEXTES ET INTERFACES ---
         canvas.drawCircle(pauseBtnX, pauseBtnY, pauseBtnRadius, pinceauBoutonPause);
         canvas.drawCircle(pauseBtnX, pauseBtnY, pauseBtnRadius, pinceauBoutonPauseBordure);
         canvas.drawRect(pauseBarLeft, pinceauSymbolePauseBordure);
@@ -283,10 +286,20 @@ public class GameView extends View {
         canvas.drawRect(pauseBarLeft, pinceauSymbolePause);
         canvas.drawRect(pauseBarRight, pinceauSymbolePause);
 
-        drawTextWithContour(canvas, nomJoueurGau, margeExtremite, positionYTextes);
-        drawTextWithContour(canvas, nomJoueurDro, getWidth() - margeExtremite, positionYTextes);
+        // Affichage des noms adaptés au mode de jeu
+        String texteGauche = (nombreDeJoueursConfig == 4) ? nomJoueurGau + " + " + nomJoueurGau2 : nomJoueurGau;
+        String texteDroit = (nombreDeJoueursConfig == 4) ? nomJoueurDro + " + " + nomJoueurDro2 : nomJoueurDro;
+
+        drawTextWithContour(canvas, texteGauche, margeExtremite, positionYTextes);
+        drawTextWithContour(canvas, texteDroit, getWidth() - margeExtremite, positionYTextes);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurGau), centreX - ecartScore, correctionYScore);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurDro), centreX + ecartScore, correctionYScore);
+    }
+
+    private void dessinerBulleVectorielle(Canvas canvas, Bulle b, float rVisuel, float decReflet, float rReflet, Paint corps, Paint reflet) {
+        canvas.drawCircle(b.x, b.y, rVisuel, corps);
+        canvas.drawCircle(b.x, b.y, rVisuel, pinceauBullesJoueurs);
+        canvas.drawCircle(b.x - decReflet, b.y - decReflet, rReflet, reflet);
     }
 
     private void drawTextWithContour(Canvas canvas, String text, float x, float y) {
@@ -303,7 +316,6 @@ public class GameView extends View {
         float touchX = event.getX(indexPointeur);
         float touchY = event.getY(indexPointeur);
 
-        // Interception du bouton Pause en priorité (uniquement sur le premier clic)
         if (action == MotionEvent.ACTION_DOWN) {
             float dx = touchX - pauseBtnX;
             float dy = touchY - pauseBtnY;
@@ -316,13 +328,15 @@ public class GameView extends View {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
-                // Vérification J1 (Camp Gauche)
+                // Attribution des doigts aux bulles disponibles selon la collision du clic
                 if (bulleJoueur1.estTouche(touchX, touchY) && idDoigtJ1 == -1) {
                     idDoigtJ1 = idPointeur;
-                }
-                // Vérification J2 (Camp Droit)
-                else if (bulleJoueur2.estTouche(touchX, touchY) && idDoigtJ2 == -1) {
+                } else if (bulleJoueur2.estTouche(touchX, touchY) && idDoigtJ2 == -1) {
                     idDoigtJ2 = idPointeur;
+                } else if (nombreDeJoueursConfig == 4 && bulleJoueur3.estTouche(touchX, touchY) && idDoigtJ3 == -1) {
+                    idDoigtJ3 = idPointeur;
+                } else if (nombreDeJoueursConfig == 4 && bulleJoueur4.estTouche(touchX, touchY) && idDoigtJ4 == -1) {
+                    idDoigtJ4 = idPointeur;
                 }
                 break;
 
@@ -333,13 +347,17 @@ public class GameView extends View {
                     float currentY = event.getY(i);
 
                     if (pId == idDoigtJ1) {
-                        bulleJoueur1.x = currentX;
-                        bulleJoueur1.y = currentY;
+                        bulleJoueur1.x = currentX; bulleJoueur1.y = currentY;
                         bulleJoueur1.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
                     } else if (pId == idDoigtJ2) {
-                        bulleJoueur2.x = currentX;
-                        bulleJoueur2.y = currentY;
+                        bulleJoueur2.x = currentX; bulleJoueur2.y = currentY;
                         bulleJoueur2.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, false);
+                    } else if (pId == idDoigtJ3 && nombreDeJoueursConfig == 4) {
+                        bulleJoueur3.x = currentX; bulleJoueur3.y = currentY;
+                        bulleJoueur3.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
+                    } else if (pId == idDoigtJ4 && nombreDeJoueursConfig == 4) {
+                        bulleJoueur4.x = currentX; bulleJoueur4.y = currentY;
+                        bulleJoueur4.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, false);
                     }
                 }
                 break;
@@ -347,21 +365,17 @@ public class GameView extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (idPointeur == idDoigtJ1) {
-                    idDoigtJ1 = -1;
-                    bulleJoueur1.reinitialiserVitesse();
-                }
-                if (idPointeur == idDoigtJ2) {
-                    idDoigtJ2 = -1;
-                    bulleJoueur2.reinitialiserVitesse();
-                }
+                if (idPointeur == idDoigtJ1) { idDoigtJ1 = -1; bulleJoueur1.reinitialiserVitesse(); }
+                else if (idPointeur == idDoigtJ2) { idDoigtJ2 = -1; bulleJoueur2.reinitialiserVitesse(); }
+                else if (idPointeur == idDoigtJ3) { idDoigtJ3 = -1; bulleJoueur3.reinitialiserVitesse(); }
+                else if (idPointeur == idDoigtJ4) { idDoigtJ4 = -1; bulleJoueur4.reinitialiserVitesse(); }
                 break;
         }
         return true;
     }
 
     private void declencherPause() {
-        // Ton code pour ouvrir l'overlay ou l'activité de pause
+        // Logique de pause
     }
 
     private void gererPhysiqueEtArbitrage() {
@@ -370,6 +384,10 @@ public class GameView extends View {
 
         bulleJoueur1.calculerVitesse();
         bulleJoueur2.calculerVitesse();
+        if (nombreDeJoueursConfig == 4) {
+            bulleJoueur3.calculerVitesse();
+            bulleJoueur4.calculerVitesse();
+        }
 
         for (int step = 0; step < PHYSIQUE_SUB_STEPS; step++) {
             poissonGlobe.x += (poissonGlobe.vitesseX / PHYSIQUE_SUB_STEPS);
@@ -377,8 +395,17 @@ public class GameView extends View {
 
             gererMursEtButsEtape(largeur, hauteur);
 
+            // Collisions avec les joueurs actifs
             calculerCollisionBullePoisson(bulleJoueur1);
             calculerCollisionBullePoisson(bulleJoueur2);
+            if (nombreDeJoueursConfig == 4) {
+                calculerCollisionBullePoisson(bulleJoueur3);
+                calculerCollisionBullePoisson(bulleJoueur4);
+
+                // Optionnel : Gérer l'entre-choc des joueurs d'une même équipe
+                gererCollisionEntreJoueurs(bulleJoueur1, bulleJoueur3);
+                gererCollisionEntreJoueurs(bulleJoueur2, bulleJoueur4);
+            }
         }
 
         poissonGlobe.vitesseX *= FRICTION_TERRAIN;
@@ -412,7 +439,6 @@ public class GameView extends View {
 
             float vitesseRelativeX = poissonGlobe.vitesseX - bulle.vX;
             float vitesseRelativeY = poissonGlobe.vitesseY - bulle.vY;
-
             float vitesseSurNormale = vitesseRelativeX * normalX + vitesseRelativeY * normalY;
 
             if (vitesseSurNormale < 0) {
@@ -422,7 +448,6 @@ public class GameView extends View {
             }
 
             float vitesseDoigtMgn = (float) Math.sqrt(bulle.vX * bulle.vX + bulle.vY * bulle.vY);
-
             if (vitesseDoigtMgn > CONFIG_VITESSE_MIN_DOIGT) {
                 float forceAjustee = vitesseDoigtMgn * CONFIG_MULT_FORCE_DOIGT;
                 poissonGlobe.vitesseX = normalX * forceAjustee;
@@ -431,29 +456,49 @@ public class GameView extends View {
         }
     }
 
+    // Sécurise l'espace pour éviter que deux coéquipiers se chevauchent ou se bloquent
+    private void gererCollisionEntreJoueurs(Bulle b1, Bulle b2) {
+        float dx = b1.x - b2.x;
+        float dy = b1.y - b2.y;
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+        float minDist = b1.rayon + b2.rayon;
+
+        if (dist < minDist && dist > 0) {
+            float normalX = dx / dist;
+            float normalY = dy / dist;
+            float chevauchement = (minDist - dist) / 2f;
+
+            // On sépare équitablement les deux bulles
+            b1.x += normalX * chevauchement; b1.y += normalY * chevauchement;
+            b2.x -= normalX * chevauchement; b2.y -= normalY * chevauchement;
+
+            b1.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
+            b2.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, b2 == bulleJoueur3);
+        }
+    }
+
     private void remiseEnJeu(boolean auJoueur2) {
         int largeur = getWidth();
+        int hauteur = getHeight();
 
-        poissonGlobe.y = getHeight() / 2f;
+        poissonGlobe.y = hauteur / 2f;
         poissonGlobe.vitesseX = 0;
         poissonGlobe.vitesseY = 0;
 
-        if (auJoueur2) {
-            poissonGlobe.x = largeur * 0.70f;
-        } else {
-            poissonGlobe.x = largeur * 0.30f;
-        }
+        poissonGlobe.x = auJoueur2 ? (largeur * 0.70f) : (largeur * 0.30f);
 
-        bulleJoueur1.x = largeur * 0.20f;
-        bulleJoueur1.y = getHeight() / 2f;
-        bulleJoueur2.x = largeur * 0.80f;
-        bulleJoueur2.y = getHeight() / 2f;
+        // Repositionnement stratégique des équipes en début de manche
+        bulleJoueur1.x = largeur * 0.25f; bulleJoueur1.y = hauteur * 0.35f;
+        bulleJoueur2.x = largeur * 0.75f; bulleJoueur2.y = hauteur * 0.35f;
+        bulleJoueur3.x = largeur * 0.15f; bulleJoueur3.y = hauteur * 0.65f;
+        bulleJoueur4.x = largeur * 0.85f; bulleJoueur4.y = hauteur * 0.65f;
 
-        idDoigtJ1 = -1;
-        idDoigtJ2 = -1;
+        idDoigtJ1 = -1; idDoigtJ2 = -1; idDoigtJ3 = -1; idDoigtJ4 = -1;
 
         bulleJoueur1.reinitialiserVitesse();
         bulleJoueur2.reinitialiserVitesse();
+        bulleJoueur3.reinitialiserVitesse();
+        bulleJoueur4.reinitialiserVitesse();
     }
 
     private void gererMursEtButsEtape(int largeurTerrain, int hauteurTerrain) {

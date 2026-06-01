@@ -9,197 +9,632 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
 public class GameView extends View {
 
+    // =======================================================================
+    // --- CONFIGURATION GLOBALE ET CALIBRATION DE LA PHYSIQUE (STATIC) ---
+    // =======================================================================
+
+    // --- LE POISSON GLOBE ---
+    public static float FACTEUR_TAILLE_POISSON = 0.08f;    // Taille de l'image (proportionnelle à la hauteur de l'écran)
+    public static float CONFIG_HITBOX_POISSON_RAYON = 0.70f; // Multiplicateur de la hitbox (1.0 = taille de l'image)
+    public static float CONFIG_HITBOX_POISSON_DECALAGE_X = 10f; // Décale la hitbox vers la droite (+) ou gauche (-)
+    public static float CONFIG_HITBOX_POISSON_DECALAGE_Y = 0f; // Décale la hitbox vers le bas (+) ou le haut (-)
+
+    // --- LES JOUEURS (BULLES) ---
+    public static float FACTEUR_TAILLE_BULLE = 0.05f; // Règle le diamètre visuel global (ex: 0.10f pour plus petit)
+    public static float CONFIG_HITBOX_BULLE_RAYON = 1.0f; // 1.0f signifie que la ligne se calera PILE sur le contour
+    public static float CONFIG_HITBOX_BULLE_DECALAGE_X = 0f;
+    public static float CONFIG_HITBOX_BULLE_DECALAGE_Y = 0f;
+
+    // --- CONSTANTES DE JEU ---
+    public static float FRICTION_TERRAIN = 0.98f;          // Glisse du poisson (1.0 = pas de fin, 0.90 = s'arrête très vite)
+    public static float CONFIG_RESTITUTION = 0.96f;          // Amorti (0.0 = pas de rebond autonome, 1.0 = rebond parfait style billard)
+    public static float CONFIG_MULT_FORCE_DOIGT = 1.8f;     // Multiplicateur de la force de ton geste
+    public static float CONFIG_VITESSE_MIN_DOIGT = 0.5f;    // Seuil en-dessous duquel le jeu ignore la vitesse du doigt
+    public static float CONFIG_VITESSE_MAX_POISSON = 45f;    // Vitesse max autorisée pour le poisson (anti-transpercement)
+    public static int PHYSIQUE_SUB_STEPS = 3;
+
+    // Configuration dynamique du nombre de joueurs (Reçu de l'Activity Jeu)
+    public int nombreDeJoueursConfig = 2;
+
     private Paint pinceauLignes;
     private Paint pinceauButs;
+    private Paint pinceauHitboxDebug;
+    private Paint pinceauBullesJoueurs;
+    private Paint pinceauBoutonPause;
+    private Paint pinceauBoutonPauseBordure;
+    private Paint pinceauSymbolePause;
+    private Paint pinceauSymbolePauseBordure;
 
-    // Nos pinceaux pour les textes (style PoissonGlaceTextView)
+    // Pinceaux pour les textes (style PoissonGlaceTextView)
     private Paint pinceauTexteJaune;
     private Paint pinceauTexteContour;
 
     // Les données de match (Le "Back" de l'arbitrage)
     public String nomJoueurGau = "Joueur 1";
     public String nomJoueurDro = "Joueur 2";
+    public String nomJoueurGau2 = "Joueur 3";
+    public String nomJoueurDro2 = "Joueur 4";
+
     public int scoreJoueurGau = 0;
     public int scoreJoueurDro = 0;
+
+    // --- GESTION DES EFFETS SONORES ---
+    private android.media.SoundPool soundPool;
+    private int[] sonBulles = new int[5];
+    private int[] sonBords = new int[5];
+    private int sonBut;
+    private boolean sonsChargés = false;
+
 
     // Repères du terrain
     public float ligneCentraleX, centreX, centreY;
     public float rayonCercleCentral, limiteSableGauche, limiteSableDroite;
-    public RectF rectangleButGauche, rectangleButDroite;
 
-    // --- NOS OBJETS DE JEU (BACK) ---
+    // Objets graphiques du terrain
+    private RectF rectangleButGauche;
+    private RectF rectangleButDroite;
+    private RectF zoneButGauche;
+    private RectF zoneButDroit;
+
+    // Éléments requis pour le bouton pause
+    private float pauseBtnX, pauseBtnY, pauseBtnRadius;
+    private RectF pauseBarLeft;
+    private RectF pauseBarRight;
+
+    // --- OBJETS DE JEU (BACK - 4 JOUEURS CONFIGURÉS) ---
     public PoissonGlobe poissonGlobe;
-    public Bulle bulleJoueur1; // Joueur Gauche
-    public Bulle bulleJoueur2; // Joueur Droit
+    public Bulle bulleJoueur1; // Joueur Gauche 1
+    public Bulle bulleJoueur2; // Joueur Droit 1
+    public Bulle bulleJoueur3; // Joueur Gauche 2 (2v2)
+    public Bulle bulleJoueur4; // Joueur Droit 2 (2v2)
 
-    // --- NOS ASSETS GRAPHIQUES ---
+    // --- ASSETS GRAPHIQUES ---
     private Bitmap imgPoissonGlobe;
-    private Bitmap imgBulle;
 
+    private float positionYTextes, margeExtremite, ecartScore, correctionYScore;
     private boolean initialisationFaite = false;
+
+    private android.os.Handler jeuHandler = new android.os.Handler();
+    private Runnable boucleJeu;
+    private final int FPS = 60;
+
+    // Tracking Multi-doigts pour les 4 joueurs (-1 = aucun doigt)
+    private int idDoigtJ1 = -1;
+    private int idDoigtJ2 = -1;
+    private int idDoigtJ3 = -1;
+    private int idDoigtJ4 = -1;
+
+    // Pour terminer la partie
+    private boolean partieTerminee = false;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialiserTerrain(context);
     }
 
+    public interface OnGameOverListener {
+        void onGameOver(String pseudoVainqueur);
+    }
+    private OnGameOverListener gameOverListener;
+
+    public void setOnGameOverListener(OnGameOverListener listener) {
+        this.gameOverListener = listener;
+    }
+
     private void initialiserTerrain(Context context) {
-        pinceauLignes = new Paint();
-        pinceauLignes.setColor(Color.WHITE);
-        pinceauLignes.setStyle(Paint.Style.STROKE);
-        pinceauLignes.setStrokeWidth(12f);
-        pinceauLignes.setAntiAlias(true);
+        pinceauLignes = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
+        pinceauButs = createPaint(Color.parseColor("#5C4033"), Paint.Style.FILL, 0f);
 
-        pinceauButs = new Paint();
-        pinceauButs.setColor(Color.parseColor("#5C4033"));
-        pinceauButs.setStyle(Paint.Style.FILL);
-
-        // On récupère la police Cherry Bomb
+        // Police Cherry Bomb
         Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
 
-        // CONTOUR BLANC : On baisse l'épaisseur pour éviter qu'il n'étouffe le centre
+        // --- INITIALISATION DU SOUNDPOOL (Audio basse latence) ---
+        android.media.AudioAttributes attrs = new android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_GAME)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+
+        soundPool = new android.media.SoundPool.Builder()
+                .setMaxStreams(10) // Permet de jouer jusqu'à 10 sons en même temps
+                .setAudioAttributes(attrs)
+                .build();
+
+        // Chargement des 6 sons de bulles
+        sonBulles[0] = soundPool.load(context, R.raw.son_bulle_1, 1);
+        sonBulles[1] = soundPool.load(context, R.raw.son_bulle_2, 1);
+        sonBulles[2] = soundPool.load(context, R.raw.son_bulle_3, 1);
+        sonBulles[3] = soundPool.load(context, R.raw.son_bulle_4, 1);
+        sonBulles[4] = soundPool.load(context, R.raw.son_bulle_5, 1);
+
+        // Chargement des 5 sons de rebonds sur les bords
+        sonBords[0] = soundPool.load(context, R.raw.son_bord_1, 1);
+        sonBords[1] = soundPool.load(context, R.raw.son_bord_2, 1);
+        sonBords[2] = soundPool.load(context, R.raw.son_bord_3, 1);
+        sonBords[3] = soundPool.load(context, R.raw.son_bord_4, 1);
+        sonBords[4] = soundPool.load(context, R.raw.son_bord_5, 1);
+
+        // Chargement du son de but
+        sonBut = soundPool.load(context, R.raw.but_sound_effect, 1);
+
+        // On vérifie que les sons sont prêts
+        soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> sonsChargés = true);
+
         pinceauTexteContour = new Paint();
         pinceauTexteContour.setTypeface(typoCherry);
         pinceauTexteContour.setColor(Color.WHITE);
-        pinceauTexteContour.setTextSize(65f); // Légèrement plus grand pour englober
+        pinceauTexteContour.setTextSize(65f);
         pinceauTexteContour.setStyle(Paint.Style.STROKE);
-        pinceauTexteContour.setStrokeWidth(12f); // Épaisseur réduite (12 au lieu de 20) pour libérer le jaune
+        pinceauTexteContour.setStrokeWidth(12f);
         pinceauTexteContour.setStrokeJoin(Paint.Join.ROUND);
-        pinceauTexteContour.setAntiAlias(true);
         pinceauTexteContour.setTextAlign(Paint.Align.CENTER);
+        pinceauTexteContour.setAntiAlias(true);
 
-// INTÉRIEUR JAUNE : On le passe en FILL pur et on augmente sa taille !
         pinceauTexteJaune = new Paint();
         pinceauTexteJaune.setTypeface(typoCherry);
         pinceauTexteJaune.setColor(Color.parseColor("#FFCC00"));
-        pinceauTexteJaune.setTextSize(65f); // Même taille de base que le contour
-        pinceauTexteJaune.setStyle(Paint.Style.FILL); // FILL pur pour éviter les conflits de tracés
+        pinceauTexteJaune.setTextSize(65f);
+        pinceauTexteJaune.setStyle(Paint.Style.FILL);
         pinceauTexteJaune.setAntiAlias(true);
         pinceauTexteJaune.setTextAlign(Paint.Align.CENTER);
 
+        pinceauBoutonPause = createPaint(Color.parseColor("#6622A7F0"), Paint.Style.FILL, 0f);
+        pinceauBoutonPauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 8f);
+        pinceauSymbolePause = createPaint(Color.parseColor("#FFCC00"), Paint.Style.FILL, 0f);
+
+        pinceauSymbolePauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
+        pinceauSymbolePauseBordure.setStrokeJoin(Paint.Join.ROUND);
+
+        imgPoissonGlobe = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_brown);
+
         rectangleButGauche = new RectF();
         rectangleButDroite = new RectF();
+        zoneButGauche = new RectF();
+        zoneButDroit = new RectF();
+        pauseBarLeft = new RectF();
+        pauseBarRight = new RectF();
 
-        // CHARGEMENT DE TES IMAGES
-        imgPoissonGlobe = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_brown);
-        imgBulle = BitmapFactory.decodeResource(context.getResources(), R.drawable.bubble_c);
+        boucleJeu = new Runnable() {
+            @Override
+            public void run() {
+                if (initialisationFaite && !partieTerminee) {
+                    gererPhysiqueEtArbitrage();
+                }
+                invalidate(); // Force le redessin (onDraw)
+                jeuHandler.postDelayed(this, 1000 / FPS);
+            }
+        };
+        jeuHandler.post(boucleJeu);
+
+        pinceauBullesJoueurs = new Paint();
+        pinceauBullesJoueurs.setColor(Color.parseColor("#40E0D0"));
+        pinceauBullesJoueurs.setStyle(Paint.Style.STROKE);
+        pinceauBullesJoueurs.setStrokeWidth(8f);
+        pinceauBullesJoueurs.setAntiAlias(true);
+
+        pinceauHitboxDebug = new Paint();
+        pinceauHitboxDebug.setColor(Color.RED);
+        pinceauHitboxDebug.setStyle(Paint.Style.STROKE);
+        pinceauHitboxDebug.setStrokeWidth(5f);
+        pinceauHitboxDebug.setAntiAlias(true);
+    }
+
+    private Paint createPaint(int color, Paint.Style style, float strokeWidth) {
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(color);
+        p.setStyle(style);
+        if (strokeWidth > 0) p.setStrokeWidth(strokeWidth);
+        return p;
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        centreX = w / 2f;
+        centreY = h / 2f;
+        ligneCentraleX = centreX;
+        limiteSableGauche = w * 0.10f;
+        limiteSableDroite = w - limiteSableGauche;
+
+        poissonGlobe = new PoissonGlobe(centreX, centreY, h * 0.08f);
+
+        // Initialisation équilibrée des 4 joueurs potentiels
+        bulleJoueur1 = new Bulle(w * 0.25f, centreY, h * 0.13f);
+        bulleJoueur2 = new Bulle(w * 0.75f, centreY, h * 0.13f);
+        bulleJoueur3 = new Bulle(w * 0.15f, centreY, h * 0.13f);
+        bulleJoueur4 = new Bulle(w * 0.85f, centreY, h * 0.13f);
+
+        float hauteurBut = h / 3f;
+        float epaisseurBut = 40f;
+        float rayonZoneBut = h * 0.22f;
+
+        rectangleButGauche.set(0, centreY - (hauteurBut / 2f), epaisseurBut, centreY + (hauteurBut / 2f));
+        rectangleButDroite.set(w - epaisseurBut, centreY - (hauteurBut / 2f), w, centreY + (hauteurBut / 2f));
+
+        rayonCercleCentral = h * 0.09f;
+        zoneButGauche.set(-rayonZoneBut, centreY - rayonZoneBut, rayonZoneBut, centreY + rayonZoneBut);
+        zoneButDroit.set(w - rayonZoneBut, centreY - rayonZoneBut, w + rayonZoneBut, centreY + rayonZoneBut);
+
+        pauseBtnRadius = h * 0.04f;
+        pauseBtnX = centreX;
+        pauseBtnY = h - pauseBtnRadius - 40f;
+
+        float barWidth = pauseBtnRadius * 0.25f, barHeight = pauseBtnRadius * 0.8f, barSpacing = pauseBtnRadius * 0.2f;
+        pauseBarLeft.set(pauseBtnX - barSpacing / 2f - barWidth, pauseBtnY - barHeight / 2f, pauseBtnX - barSpacing / 2f, pauseBtnY + barHeight / 2f);
+        pauseBarRight.set(pauseBtnX + barSpacing / 2f, pauseBtnY - barHeight / 2f, pauseBtnX + barSpacing / 2f + barWidth, pauseBtnY + barHeight / 2f);
+
+        positionYTextes = 80f;
+        margeExtremite = w * 0.10f;
+        ecartScore = 120f;
+        correctionYScore = positionYTextes + 15f;
+
+        initialisationFaite = true;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int largeur = getWidth();
         int hauteur = getHeight();
 
-        // =======================================================================
-        // 1. CALCULS DES REPERES DU TERRAIN (Si pas encore fait)
-        // =======================================================================
-        if (!initialisationFaite) {
-            centreX = largeur / 2f;
-            centreY = hauteur / 2f;
-            ligneCentraleX = centreX;
-            limiteSableGauche = largeur * 0.10f;
-            limiteSableDroite = largeur - (largeur * 0.10f);
-
-            // Création des objets au centre de leurs zones respectives
-            float rayonPoisson = hauteur * 0.08f;
-            float rayonBulle = hauteur * 0.13f;
-
-            poissonGlobe = new PoissonGlobe(centreX, centreY, rayonPoisson);
-            bulleJoueur1 = new Bulle(largeur * 0.20f, centreY, rayonBulle); // Positionné dans son camp gauche
-            bulleJoueur2 = new Bulle(largeur * 0.80f, centreY, rayonBulle); // Positionné dans son camp droit
-
-            initialisationFaite = true;
-        }
-
-        float hauteurBut = hauteur / 3f;
-        float epaisseurBut = 40f;
-
-        // =======================================================================
-        // 2. DESSIN DES BUTS MARRONS
-        // =======================================================================
-        rectangleButGauche.set(0, centreY - (hauteurBut / 2f), epaisseurBut, centreY + (hauteurBut / 2f));
-        rectangleButDroite.set(largeur - epaisseurBut, centreY - (hauteurBut / 2f), largeur, centreY + (hauteurBut / 2f));
         canvas.drawRect(rectangleButGauche, pinceauButs);
         canvas.drawRect(rectangleButDroite, pinceauButs);
-
-        // =======================================================================
-        // 3. DESSIN DES LIGNES BLANCHES
-        // =======================================================================
         canvas.drawLine(ligneCentraleX, 0, ligneCentraleX, hauteur, pinceauLignes);
-        rayonCercleCentral = hauteur * 0.09f;
         canvas.drawCircle(centreX, centreY, rayonCercleCentral, pinceauLignes);
-
-        float rayonZoneBut = hauteur * 0.22f;
-        RectF zoneButGauche = new RectF(-rayonZoneBut, centreY - rayonZoneBut, rayonZoneBut, centreY + rayonZoneBut);
         canvas.drawArc(zoneButGauche, 270, 180, false, pinceauLignes);
-
-        RectF zoneButDroit = new RectF(largeur - rayonZoneBut, centreY - rayonZoneBut, largeur + rayonZoneBut, centreY + rayonZoneBut);
         canvas.drawArc(zoneButDroit, 90, 180, false, pinceauLignes);
 
-        // =======================================================================
-        // 4. DESSIN DES ASSETS (Poisson-Globe et Bulles)
-        // =======================================================================
+        // 1. CALCUL DE TOUS LES RAYONS DE BASE VISUELS
+        float rayonVisuelPoisson = hauteur * FACTEUR_TAILLE_POISSON;
+        float rayonVisuelBulle = hauteur * FACTEUR_TAILLE_BULLE;
 
-        // Dessin du Palet (Poisson Globe) centré sur ses coordonnées (x,y)
+        // 2. CORRECTION CRITIQUE : MISE À JOUR DES RAYONS DES OBJETS AVANT TOUT DESSIN
+        poissonGlobe.rayon = rayonVisuelPoisson * CONFIG_HITBOX_POISSON_RAYON;
+        bulleJoueur1.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
+        bulleJoueur2.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
+        bulleJoueur3.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
+        bulleJoueur4.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
+
+        // --- A. DESSIN DU POISSON (IMAGE) ---
         if (imgPoissonGlobe != null) {
             RectF positionPoisson = new RectF(
-                    poissonGlobe.x - poissonGlobe.rayon,
-                    poissonGlobe.y - poissonGlobe.rayon,
-                    poissonGlobe.x + poissonGlobe.rayon,
-                    poissonGlobe.y + poissonGlobe.rayon
+                    poissonGlobe.x - rayonVisuelPoisson,
+                    poissonGlobe.y - rayonVisuelPoisson,
+                    poissonGlobe.x + rayonVisuelPoisson,
+                    poissonGlobe.y + rayonVisuelPoisson
             );
             canvas.drawBitmap(imgPoissonGlobe, null, positionPoisson, null);
         }
 
-        // Dessin des Bulles
-        if (imgBulle != null) {
-            // Dessin de la Bulle du Joueur 1 (Gauche)
-            RectF positionBulleJ1 = new RectF(
-                    bulleJoueur1.x - bulleJoueur1.rayon,
-                    bulleJoueur1.y - bulleJoueur1.rayon,
-                    bulleJoueur1.x + bulleJoueur1.rayon,
-                    bulleJoueur1.y + bulleJoueur1.rayon
-            );
-            canvas.drawBitmap(imgBulle, null, positionBulleJ1, null);
+        // --- B. DESSIN DES JOUEURS (100% VECTORIEL) ---
+        Paint pinceauCorpsBulle = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pinceauCorpsBulle.setColor(Color.parseColor("#A0E0FF"));
+        pinceauCorpsBulle.setStyle(Paint.Style.FILL);
+        pinceauCorpsBulle.setAlpha(80);
 
-            // Dessin de la Bulle du Joueur 2 (Droite)
-            RectF positionBulleJ2 = new RectF(
-                    bulleJoueur2.x - bulleJoueur2.rayon,
-                    bulleJoueur2.y - bulleJoueur2.rayon,
-                    bulleJoueur2.x + bulleJoueur2.rayon,
-                    bulleJoueur2.y + bulleJoueur2.rayon
-            );
-            canvas.drawBitmap(imgBulle, null, positionBulleJ2, null);
+        Paint pinceauRefletBulle = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pinceauRefletBulle.setColor(Color.WHITE);
+        pinceauRefletBulle.setStyle(Paint.Style.FILL);
+        pinceauRefletBulle.setAlpha(180);
+
+        float decalageReflet = rayonVisuelBulle * 0.35f;
+        float rayonReflet = rayonVisuelBulle * 0.15f;
+
+        // Équipe Gauche (J1 actif toujours, J3 actif uniquement en mode 4 joueurs)
+        dessinerBulleVectorielle(canvas, bulleJoueur1, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        if (nombreDeJoueursConfig == 4) {
+            dessinerBulleVectorielle(canvas, bulleJoueur3, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
         }
 
-        // =======================================================================
-        // 5. TABLEAU D'AFFICHAGE (Noms aux extrémités, Scores au centre)
-        // =======================================================================
-        float positionYTextes = 80f;
-        float margeExtremite = largeur * 0.10f;
-        float ecartScore = 120f;
+        // Équipe Droite (J2 actif toujours, J4 actif uniquement en mode 4 joueurs)
+        dessinerBulleVectorielle(canvas, bulleJoueur2, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        if (nombreDeJoueursConfig == 4) {
+            dessinerBulleVectorielle(canvas, bulleJoueur4, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        }
 
-        // --- JOUEUR GAUCHE ---
-        canvas.drawText(nomJoueurGau, margeExtremite, positionYTextes, pinceauTexteContour);
-        canvas.drawText(nomJoueurGau, margeExtremite, positionYTextes, pinceauTexteJaune);
+        // --- C. DESSIN PAUSE & TEXTES ---
+        canvas.drawCircle(pauseBtnX, pauseBtnY, pauseBtnRadius, pinceauBoutonPause);
+        canvas.drawCircle(pauseBtnX, pauseBtnY, pauseBtnRadius, pinceauBoutonPauseBordure);
+        canvas.drawRect(pauseBarLeft, pinceauSymbolePauseBordure);
+        canvas.drawRect(pauseBarRight, pinceauSymbolePauseBordure);
+        canvas.drawRect(pauseBarLeft, pinceauSymbolePause);
+        canvas.drawRect(pauseBarRight, pinceauSymbolePause);
 
-        // --- JOUEUR DROIT ---
-        canvas.drawText(nomJoueurDro, largeur - margeExtremite, positionYTextes, pinceauTexteContour);
-        canvas.drawText(nomJoueurDro, largeur - margeExtremite, positionYTextes, pinceauTexteJaune);
+        // Affichage dynamique des scores selon la configuration de la partie
+        String texteGauche = (nombreDeJoueursConfig == 4) ? nomJoueurGau + " + " + nomJoueurGau2 : nomJoueurGau;
+        String texteDroit = (nombreDeJoueursConfig == 4) ? nomJoueurDro + " + " + nomJoueurDro2 : nomJoueurDro;
 
-        // --- SCORES (Applique le même effet Cherry Bomb Jaune et Blanc) ---
-        canvas.drawText(String.valueOf(scoreJoueurGau), centreX - ecartScore, positionYTextes + 15f, pinceauTexteContour);
-        canvas.drawText(String.valueOf(scoreJoueurGau), centreX - ecartScore, positionYTextes + 15f, pinceauTexteJaune);
+        drawTextWithContour(canvas, texteGauche, margeExtremite, positionYTextes);
+        drawTextWithContour(canvas, texteDroit, getWidth() - margeExtremite, positionYTextes);
+        drawTextWithContour(canvas, String.valueOf(scoreJoueurGau), centreX - ecartScore, correctionYScore);
+        drawTextWithContour(canvas, String.valueOf(scoreJoueurDro), centreX + ecartScore, correctionYScore);
 
-        canvas.drawText(String.valueOf(scoreJoueurDro), centreX + ecartScore, positionYTextes + 15f, pinceauTexteContour);
-        canvas.drawText(String.valueOf(scoreJoueurDro), centreX + ecartScore, positionYTextes + 15f, pinceauTexteJaune);
+        // --- D. EXPULSION ET ARBITRAGE DU MARQUAGE DE FIN ---
+        if (!partieTerminee) {
+            if (scoreJoueurGau >= 6 || scoreJoueurDro >= 6) {
+                partieTerminee = true;
+
+                String vainqueur;
+                if (scoreJoueurGau >= 6) {
+                    vainqueur = (nombreDeJoueursConfig == 4) ? nomJoueurGau + " & " + nomJoueurGau2 : nomJoueurGau;
+                } else {
+                    vainqueur = (nombreDeJoueursConfig == 4) ? nomJoueurDro + " & " + nomJoueurDro2 : nomJoueurDro;
+                }
+
+                if (gameOverListener != null) {
+                    gameOverListener.onGameOver(vainqueur);
+                }
+            }
+        }
+    }
+
+    private void dessinerBulleVectorielle(Canvas canvas, Bulle b, float rVisuel, float decReflet, float rReflet, Paint corps, Paint reflet) {
+        canvas.drawCircle(b.x, b.y, rVisuel, corps);
+        canvas.drawCircle(b.x, b.y, rVisuel, pinceauBullesJoueurs);
+        canvas.drawCircle(b.x - decReflet, b.y - decReflet, rReflet, reflet);
+    }
+
+    private void drawTextWithContour(Canvas canvas, String text, float x, float y) {
+        canvas.drawText(text, x, y, pinceauTexteContour);
+        canvas.drawText(text, x, y, pinceauTexteJaune);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+        int indexPointeur = event.getActionIndex();
+        int idPointeur = event.getPointerId(indexPointeur);
+
+        float touchX = event.getX(indexPointeur);
+        float touchY = event.getY(indexPointeur);
+
+        // Interception du bouton Pause en priorité (uniquement sur le premier clic)
+        if (action == MotionEvent.ACTION_DOWN) {
+            float dx = touchX - pauseBtnX;
+            float dy = touchY - pauseBtnY;
+            if ((dx * dx + dy * dy) <= (pauseBtnRadius * pauseBtnRadius)) {
+                declencherPause();
+                return true;
+            }
+        }
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                // Attribution unique des index de pointeurs pour les 4 joueurs
+                if (bulleJoueur1.estTouche(touchX, touchY) && idDoigtJ1 == -1) {
+                    idDoigtJ1 = idPointeur;
+                } else if (bulleJoueur2.estTouche(touchX, touchY) && idDoigtJ2 == -1) {
+                    idDoigtJ2 = idPointeur;
+                } else if (nombreDeJoueursConfig == 4 && bulleJoueur3.estTouche(touchX, touchY) && idDoigtJ3 == -1) {
+                    idDoigtJ3 = idPointeur;
+                } else if (nombreDeJoueursConfig == 4 && bulleJoueur4.estTouche(touchX, touchY) && idDoigtJ4 == -1) {
+                    idDoigtJ4 = idPointeur;
+                }
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                for (int i = 0; i < event.getPointerCount(); i++) {
+                    int pId = event.getPointerId(i);
+                    float currentX = event.getX(i);
+                    float currentY = event.getY(i);
+
+                    if (pId == idDoigtJ1) {
+                        bulleJoueur1.x = currentX; bulleJoueur1.y = currentY;
+                        bulleJoueur1.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
+                    } else if (pId == idDoigtJ2) {
+                        bulleJoueur2.x = currentX; bulleJoueur2.y = currentY;
+                        bulleJoueur2.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, false);
+                    } else if (pId == idDoigtJ3 && nombreDeJoueursConfig == 4) {
+                        bulleJoueur3.x = currentX; bulleJoueur3.y = currentY;
+                        bulleJoueur3.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
+                    } else if (pId == idDoigtJ4 && nombreDeJoueursConfig == 4) {
+                        bulleJoueur4.x = currentX; bulleJoueur4.y = currentY;
+                        bulleJoueur4.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, false);
+                    }
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (idPointeur == idDoigtJ1) { idDoigtJ1 = -1; bulleJoueur1.reinitialiserVitesse(); }
+                else if (idPointeur == idDoigtJ2) { idDoigtJ2 = -1; bulleJoueur2.reinitialiserVitesse(); }
+                else if (idPointeur == idDoigtJ3) { idDoigtJ3 = -1; bulleJoueur3.reinitialiserVitesse(); }
+                else if (idPointeur == idDoigtJ4) { idDoigtJ4 = -1; bulleJoueur4.reinitialiserVitesse(); }
+                break;
+        }
+        return true;
+    }
+
+    private void declencherPause() {
+        // Logique de pause
+    }
+
+    private void gererPhysiqueEtArbitrage() {
+        int largeur = getWidth();
+        int hauteur = getHeight();
+
+        bulleJoueur1.calculerVitesse();
+        bulleJoueur2.calculerVitesse();
+        if (nombreDeJoueursConfig == 4) {
+            bulleJoueur3.calculerVitesse();
+            bulleJoueur4.calculerVitesse();
+        }
+
+        for (int step = 0; step < PHYSIQUE_SUB_STEPS; step++) {
+            poissonGlobe.x += (poissonGlobe.vitesseX / PHYSIQUE_SUB_STEPS);
+            poissonGlobe.y += (poissonGlobe.vitesseY / PHYSIQUE_SUB_STEPS);
+
+            gererMursEtButsEtape(largeur, hauteur);
+
+            calculerCollisionBullePoisson(bulleJoueur1);
+            calculerCollisionBullePoisson(bulleJoueur2);
+            if (nombreDeJoueursConfig == 4) {
+                calculerCollisionBullePoisson(bulleJoueur3);
+                calculerCollisionBullePoisson(bulleJoueur4);
+                // Évite que deux équipiers s'empilent l'un sur l'autre
+                gererCollisionEntreJoueurs(bulleJoueur1, bulleJoueur3);
+                gererCollisionEntreJoueurs(bulleJoueur2, bulleJoueur4);
+            }
+        }
+
+        poissonGlobe.vitesseX *= FRICTION_TERRAIN;
+        poissonGlobe.vitesseY *= FRICTION_TERRAIN;
+
+        float vitesseActuelle = (float) Math.sqrt(poissonGlobe.vitesseX * poissonGlobe.vitesseX + poissonGlobe.vitesseY * poissonGlobe.vitesseY);
+        if (vitesseActuelle > CONFIG_VITESSE_MAX_POISSON) {
+            poissonGlobe.vitesseX = (poissonGlobe.vitesseX / vitesseActuelle) * CONFIG_VITESSE_MAX_POISSON;
+            poissonGlobe.vitesseY = (poissonGlobe.vitesseY / vitesseActuelle) * CONFIG_VITESSE_MAX_POISSON;
+        }
+    }
+
+    private void calculerCollisionBullePoisson(Bulle bulle) {
+        float poissonHitboxX = poissonGlobe.x + CONFIG_HITBOX_POISSON_DECALAGE_X;
+        float poissonHitboxY = poissonGlobe.y + CONFIG_HITBOX_POISSON_DECALAGE_Y;
+        float bulleHitboxX = bulle.x + CONFIG_HITBOX_BULLE_DECALAGE_X;
+        float bulleHitboxY = bulle.y + CONFIG_HITBOX_BULLE_DECALAGE_Y;
+
+        float dx = poissonHitboxX - bulleHitboxX;
+        float dy = poissonHitboxY - bulleHitboxY;
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+        float distanceMin = poissonGlobe.rayon + bulle.rayon;
+
+        if (distance < distanceMin && distance > 0) {
+            float normalX = dx / distance;
+            float normalY = dy / distance;
+
+            float chevauchement = distanceMin - distance;
+            poissonGlobe.x += normalX * chevauchement;
+            poissonGlobe.y += normalY * chevauchement;
+
+            float vitesseRelativeX = poissonGlobe.vitesseX - bulle.vX;
+            float vitesseRelativeY = poissonGlobe.vitesseY - bulle.vY;
+            float vitesseSurNormale = vitesseRelativeX * normalX + vitesseRelativeY * normalY;
+
+            if (vitesseSurNormale < 0) {
+                float impulsion = -(1.0f + CONFIG_RESTITUTION) * vitesseSurNormale;
+                poissonGlobe.vitesseX += normalX * impulsion;
+                poissonGlobe.vitesseY += normalY * impulsion;
+            }
+
+            float vitesseDoigtMgn = (float) Math.sqrt(bulle.vX * bulle.vX + bulle.vY * bulle.vY);
+
+            if (vitesseDoigtMgn > CONFIG_VITESSE_MIN_DOIGT) {
+                float forceAjustee = vitesseDoigtMgn * CONFIG_MULT_FORCE_DOIGT;
+                poissonGlobe.vitesseX = normalX * forceAjustee;
+                poissonGlobe.vitesseY = normalY * forceAjustee;
+            }
+
+            jouerSonBulle();
+        }
+    }
+
+    private void gererCollisionEntreJoueurs(Bulle b1, Bulle b2) {
+        float dx = b1.x - b2.x;
+        float dy = b1.y - b2.y;
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+        float minDist = b1.rayon + b2.rayon;
+
+        if (dist < minDist && dist > 0) {
+            float normalX = dx / dist;
+            float normalY = dy / dist;
+            float chevauchement = (minDist - dist) / 2f;
+
+            b1.x += normalX * chevauchement; b1.y += normalY * chevauchement;
+            b2.x -= normalX * chevauchement; b2.y -= normalY * chevauchement;
+
+            b1.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
+            b2.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, b2 == bulleJoueur3);
+        }
+    }
+
+    private void remiseEnJeu(boolean auJoueur2) {
+        int largeur = getWidth();
+        int hauteur = getHeight();
+
+        poissonGlobe.y = hauteur / 2f;
+        poissonGlobe.vitesseX = 0;
+        poissonGlobe.vitesseY = 0;
+
+        poissonGlobe.x = auJoueur2 ? (largeur * 0.70f) : (largeur * 0.30f);
+
+        // Repositionnement propre des 4 joueurs
+        bulleJoueur1.x = largeur * 0.25f; bulleJoueur1.y = hauteur * 0.35f;
+        bulleJoueur2.x = largeur * 0.75f; bulleJoueur2.y = hauteur * 0.35f;
+        bulleJoueur3.x = largeur * 0.15f; bulleJoueur3.y = hauteur * 0.65f;
+        bulleJoueur4.x = largeur * 0.85f; bulleJoueur4.y = hauteur * 0.65f;
+
+        idDoigtJ1 = -1; idDoigtJ2 = -1; idDoigtJ3 = -1; idDoigtJ4 = -1;
+
+        bulleJoueur1.reinitialiserVitesse();
+        bulleJoueur2.reinitialiserVitesse();
+        bulleJoueur3.reinitialiserVitesse();
+        bulleJoueur4.reinitialiserVitesse();
+    }
+
+    private void gererMursEtButsEtape(int largeurTerrain, int hauteurTerrain) {
+        if (poissonGlobe.y - poissonGlobe.rayon < 0) {
+            poissonGlobe.y = poissonGlobe.rayon;
+            poissonGlobe.vitesseY = -poissonGlobe.vitesseY;
+            jouerSonBord();
+        } else if (poissonGlobe.y + poissonGlobe.rayon > hauteurTerrain) {
+            poissonGlobe.y = hauteurTerrain - poissonGlobe.rayon;
+            poissonGlobe.vitesseY = -poissonGlobe.vitesseY;
+            jouerSonBord();
+        }
+
+        float hauteurBut = hauteurTerrain / 3f;
+        float hautBut = (hauteurTerrain / 2f) - (hauteurBut / 2f);
+        float basBut = (hauteurTerrain / 2f) + (hauteurBut / 2f);
+
+        if (poissonGlobe.y >= hautBut && poissonGlobe.y <= basBut) {
+            if (poissonGlobe.x - poissonGlobe.rayon <= 0) {
+                scoreJoueurDro++;
+                jouerSonBut();
+                remiseEnJeu(false);
+            } else if (poissonGlobe.x + poissonGlobe.rayon >= largeurTerrain) {
+                scoreJoueurGau++;
+                jouerSonBut();
+                remiseEnJeu(true);
+            }
+        } else {
+            if (poissonGlobe.x - poissonGlobe.rayon < 0) {
+                poissonGlobe.x = poissonGlobe.rayon;
+                poissonGlobe.vitesseX = -poissonGlobe.vitesseX;
+                jouerSonBord();
+            } else if (poissonGlobe.x + poissonGlobe.rayon >= largeurTerrain) {
+                poissonGlobe.x = largeurTerrain - poissonGlobe.rayon;
+                poissonGlobe.vitesseX = -poissonGlobe.vitesseX;
+                jouerSonBord();
+            }
+        }
+    }
+
+    private void jouerSonBulle() {
+        if (sonsChargés && soundPool != null) {
+            int indexAleatoire = (int) (Math.random() * 5);
+            soundPool.play(sonBulles[indexAleatoire], 1.0f, 1.0f, 1, 0, 1.0f);
+        }
+    }
+
+    private void jouerSonBord() {
+        if (sonsChargés && soundPool != null) {
+            int indexAleatoire = (int) (Math.random() * 5);
+            soundPool.play(sonBords[indexAleatoire], 0.8f, 0.8f, 1, 0, 1.0f); // Légèrement moins fort
+        }
+    }
+
+    private void jouerSonBut() {
+        if (sonsChargés && soundPool != null) {
+            soundPool.play(sonBut, 1.0f, 1.0f, 2, 0, 1.0f);
+        }
     }
 }

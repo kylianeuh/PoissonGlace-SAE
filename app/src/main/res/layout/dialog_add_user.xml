@@ -3,20 +3,73 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:layout_margin="10dp"
+    android:background="@drawable/bouton_arrondi_bordure"
+    android:gravity="center_horizontal">
 
-    <TextView
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/text_titre_profil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Créer unnouveau profil"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="10dp"/>
+        android:text="Créer un nouveau profil"
+        android:textSize="30sp"
+        android:fontFamily="@font/cherry_bomb"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="20dp" />
 
     <EditText
         android:id="@+id/edit_pseudo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:background="@android:color/transparent"
         android:hint="Entrez votre pseudo"
-        android:inputType="textPersonName" />
+        android:textColorHint="#FFFFFF"
+        android:fontFamily="@font/cherry_bomb"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"
+        android:inputType="textPersonName"
+        android:maxLength="15"
+        android:gravity="center" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#FFFFFF"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.sae402.poissonglobe.PoissonGlaceTextView
+            android:id="@+id/btn_dialog_annuler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ANNULER"
+            android:textColor="#BBFFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="@font/cherry_bomb"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="16dp" />
+
+        <com.sae402.poissonglobe.PoissonGlaceTextView
+            android:id="@+id/btn_dialog_creer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CRÉER"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/cherry_bomb"
+            android:textSize="20sp"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
 </LinearLayout>

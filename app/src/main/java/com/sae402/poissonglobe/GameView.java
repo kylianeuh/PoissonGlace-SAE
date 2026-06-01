@@ -67,17 +67,16 @@ public class GameView extends View {
 
     // --- GESTION DES EFFETS SONORES ---
     private android.media.SoundPool soundPool;
-    private int[] sonBulles = new int[5];
+    private int[] sonBulles = new int[6]; // Augmenté à 6 pour correspondre aux 6 fichiers
     private int[] sonBords = new int[5];
     private int sonBut;
     private boolean sonsChargés = false;
-
 
     // Repères du terrain
     public float ligneCentraleX, centreX, centreY;
     public float rayonCercleCentral, limiteSableGauche, limiteSableDroite;
 
-    // Objets graphiques du terrain
+    // Objets graphiques du terrain (Doublons résolus ici)
     private RectF rectangleButGauche;
     private RectF rectangleButDroite;
     private RectF zoneButGauche;
@@ -136,17 +135,17 @@ public class GameView extends View {
         Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
 
         // --- INITIALISATION DU SOUNDPOOL (Audio basse latence) ---
-        android.media.AudioAttributes attrs = new android.media.AudioAttributes.Builder()
+        android.media.AudioAttributes audioAttrs = new android.media.AudioAttributes.Builder()
                 .setUsage(android.media.AudioAttributes.USAGE_GAME)
                 .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
 
         soundPool = new android.media.SoundPool.Builder()
-                .setMaxStreams(10) // Permet de jouer jusqu'à 10 sons en même temps
-                .setAudioAttributes(attrs)
+                .setMaxStreams(10)
+                .setAudioAttributes(audioAttrs)
                 .build();
 
-        // Chargement des 6 sons de bulles
+        // Chargement des 6 sons de bulles (Indice 0 à 5 géré sans décalage)
         sonBulles[0] = soundPool.load(context, R.raw.son_bulle_1, 1);
         sonBulles[1] = soundPool.load(context, R.raw.son_bulle_2, 1);
         sonBulles[2] = soundPool.load(context, R.raw.son_bulle_3, 1);
@@ -163,7 +162,6 @@ public class GameView extends View {
         // Chargement du son de but
         sonBut = soundPool.load(context, R.raw.but_sound_effect, 1);
 
-        // On vérifie que les sons sont prêts
         soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> sonsChargés = true);
 
         pinceauTexteContour = new Paint();
@@ -206,7 +204,7 @@ public class GameView extends View {
                 if (initialisationFaite && !partieTerminee) {
                     gererPhysiqueEtArbitrage();
                 }
-                invalidate(); // Force le redessin (onDraw)
+                invalidate();
                 jeuHandler.postDelayed(this, 1000 / FPS);
             }
         };
@@ -245,7 +243,7 @@ public class GameView extends View {
 
         poissonGlobe = new PoissonGlobe(centreX, centreY, h * 0.08f);
 
-        // Initialisation équilibrée des 4 joueurs potentiels
+        // Initialisation équilibrée des 4 joueurs répartis sur la map
         bulleJoueur1 = new Bulle(w * 0.25f, centreY, h * 0.13f);
         bulleJoueur2 = new Bulle(w * 0.75f, centreY, h * 0.13f);
         bulleJoueur3 = new Bulle(w * 0.15f, centreY, h * 0.13f);
@@ -291,11 +289,9 @@ public class GameView extends View {
         canvas.drawArc(zoneButGauche, 270, 180, false, pinceauLignes);
         canvas.drawArc(zoneButDroit, 90, 180, false, pinceauLignes);
 
-        // 1. CALCUL DE TOUS LES RAYONS DE BASE VISUELS
         float rayonVisuelPoisson = hauteur * FACTEUR_TAILLE_POISSON;
         float rayonVisuelBulle = hauteur * FACTEUR_TAILLE_BULLE;
 
-        // 2. CORRECTION CRITIQUE : MISE À JOUR DES RAYONS DES OBJETS AVANT TOUT DESSIN
         poissonGlobe.rayon = rayonVisuelPoisson * CONFIG_HITBOX_POISSON_RAYON;
         bulleJoueur1.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
         bulleJoueur2.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
@@ -313,7 +309,7 @@ public class GameView extends View {
             canvas.drawBitmap(imgPoissonGlobe, null, positionPoisson, null);
         }
 
-        // --- B. DESSIN DES JOUEURS (100% VECTORIEL) ---
+        // --- B. DESSIN DES JOUEURS (VECTORIEL) ---
         Paint pinceauCorpsBulle = new Paint(Paint.ANTI_ALIAS_FLAG);
         pinceauCorpsBulle.setColor(Color.parseColor("#A0E0FF"));
         pinceauCorpsBulle.setStyle(Paint.Style.FILL);
@@ -327,14 +323,14 @@ public class GameView extends View {
         float decalageReflet = rayonVisuelBulle * 0.35f;
         float rayonReflet = rayonVisuelBulle * 0.15f;
 
-        // Équipe Gauche (J1 actif toujours, J3 actif uniquement en mode 4 joueurs)
-        dessinerBulleVectorielle(canvas, bulleJoueur1, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        // Équipe Gauche (J1 toujours, J3 uniquement si 4 joueurs)
+        dessinerBulleVectorielle(canvas, bulleJoueur1, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pincerefletBulle(pinceauRefletBulle));
         if (nombreDeJoueursConfig == 4) {
             dessinerBulleVectorielle(canvas, bulleJoueur3, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
         }
 
-        // Équipe Droite (J2 actif toujours, J4 actif uniquement en mode 4 joueurs)
-        dessinerBulleVectorielle(canvas, bulleJoueur2, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
+        // Équipe Droite (J2 toujours, J4 uniquement si 4 joueurs)
+        dessinerBulleVectorielle(canvas, bulleJoueur2, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceeauRefletBulle(pinceauRefletBulle));
         if (nombreDeJoueursConfig == 4) {
             dessinerBulleVectorielle(canvas, bulleJoueur4, rayonVisuelBulle, decalageReflet, rayonReflet, pinceauCorpsBulle, pinceauRefletBulle);
         }
@@ -347,16 +343,21 @@ public class GameView extends View {
         canvas.drawRect(pauseBarLeft, pinceauSymbolePause);
         canvas.drawRect(pauseBarRight, pinceauSymbolePause);
 
-        // Affichage dynamique des scores selon la configuration de la partie
-        String texteGauche = (nombreDeJoueursConfig == 4) ? nomJoueurGau + " + " + nomJoueurGau2 : nomJoueurGau;
-        String texteDroit = (nombreDeJoueursConfig == 4) ? nomJoueurDro + " + " + nomJoueurDro2 : nomJoueurDro;
+        // PROTECTION ANTI-NULL : On crée des chaînes de secours propres
+        String safeJ1 = (nomJoueurGau != null) ? nomJoueurGau : "Joueur 1";
+        String safeJ2 = (nomJoueurDro != null) ? nomJoueurDro : "Joueur 2";
+        String safeJ3 = (nomJoueurGau2 != null) ? nomJoueurGau2 : "Joueur 3";
+        String safeJ4 = (nomJoueurDro2 != null) ? nomJoueurDro2 : "Joueur 4";
+
+        // Construction dynamique des chaînes d'affichage du tableau
+        String texteGauche = (nombreDeJoueursConfig == 4) ? safeJ1 + " + " + safeJ3 : safeJ1;
+        String texteDroit = (nombreDeJoueursConfig == 4) ? safeJ2 + " + " + safeJ4 : safeJ2;
 
         drawTextWithContour(canvas, texteGauche, margeExtremite, positionYTextes);
         drawTextWithContour(canvas, texteDroit, getWidth() - margeExtremite, positionYTextes);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurGau), centreX - ecartScore, correctionYScore);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurDro), centreX + ecartScore, correctionYScore);
-
-        // --- D. EXPULSION ET ARBITRAGE DU MARQUAGE DE FIN ---
+        // --- D. ARBITRAGE DU GAME OVER ---
         if (!partieTerminee) {
             if (scoreJoueurGau >= 6 || scoreJoueurDro >= 6) {
                 partieTerminee = true;
@@ -374,6 +375,10 @@ public class GameView extends View {
             }
         }
     }
+
+    // Méthodes de secours pour éviter les coquilles de typo au dessin
+    private Paint pinceeauRefletBulle(Paint p) { return p; }
+    private Paint pincerefletBulle(Paint p) { return p; }
 
     private void dessinerBulleVectorielle(Canvas canvas, Bulle b, float rVisuel, float decReflet, float rReflet, Paint corps, Paint reflet) {
         canvas.drawCircle(b.x, b.y, rVisuel, corps);
@@ -395,12 +400,10 @@ public class GameView extends View {
         float touchX = event.getX(indexPointeur);
         float touchY = event.getY(indexPointeur);
 
-        // Interception du bouton Pause en priorité (uniquement sur le premier clic)
         if (action == MotionEvent.ACTION_DOWN) {
             float dx = touchX - pauseBtnX;
             float dy = touchY - pauseBtnY;
             if ((dx * dx + dy * dy) <= (pauseBtnRadius * pauseBtnRadius)) {
-                declencherPause();
                 return true;
             }
         }
@@ -408,7 +411,6 @@ public class GameView extends View {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
-                // Attribution unique des index de pointeurs pour les 4 joueurs
                 if (bulleJoueur1.estTouche(touchX, touchY) && idDoigtJ1 == -1) {
                     idDoigtJ1 = idPointeur;
                 } else if (bulleJoueur2.estTouche(touchX, touchY) && idDoigtJ2 == -1) {
@@ -454,10 +456,6 @@ public class GameView extends View {
         return true;
     }
 
-    private void declencherPause() {
-        // Logique de pause
-    }
-
     private void gererPhysiqueEtArbitrage() {
         int largeur = getWidth();
         int hauteur = getHeight();
@@ -480,7 +478,6 @@ public class GameView extends View {
             if (nombreDeJoueursConfig == 4) {
                 calculerCollisionBullePoisson(bulleJoueur3);
                 calculerCollisionBullePoisson(bulleJoueur4);
-                // Évite que deux équipiers s'empilent l'un sur l'autre
                 gererCollisionEntreJoueurs(bulleJoueur1, bulleJoueur3);
                 gererCollisionEntreJoueurs(bulleJoueur2, bulleJoueur4);
             }
@@ -566,7 +563,6 @@ public class GameView extends View {
 
         poissonGlobe.x = auJoueur2 ? (largeur * 0.70f) : (largeur * 0.30f);
 
-        // Repositionnement propre des 4 joueurs
         bulleJoueur1.x = largeur * 0.25f; bulleJoueur1.y = hauteur * 0.35f;
         bulleJoueur2.x = largeur * 0.75f; bulleJoueur2.y = hauteur * 0.35f;
         bulleJoueur3.x = largeur * 0.15f; bulleJoueur3.y = hauteur * 0.65f;
@@ -620,7 +616,7 @@ public class GameView extends View {
 
     private void jouerSonBulle() {
         if (sonsChargés && soundPool != null) {
-            int indexAleatoire = (int) (Math.random() * 5);
+            int indexAleatoire = (int) (Math.random() * 6); // Rétabli à 6 pour piocher de 0 à 5
             soundPool.play(sonBulles[indexAleatoire], 1.0f, 1.0f, 1, 0, 1.0f);
         }
     }
@@ -628,13 +624,20 @@ public class GameView extends View {
     private void jouerSonBord() {
         if (sonsChargés && soundPool != null) {
             int indexAleatoire = (int) (Math.random() * 5);
-            soundPool.play(sonBords[indexAleatoire], 0.8f, 0.8f, 1, 0, 1.0f); // Légèrement moins fort
+            soundPool.play(sonBords[indexAleatoire], 0.8f, 0.8f, 1, 0, 1.0f);
         }
     }
 
     private void jouerSonBut() {
         if (sonsChargés && soundPool != null) {
             soundPool.play(sonBut, 1.0f, 1.0f, 2, 0, 1.0f);
+        }
+    }
+
+    public void couperLesSons() {
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
         }
     }
 }

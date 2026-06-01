@@ -21,13 +21,13 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        View logoTest = findViewById(R.id.txtTitre);
 
+        //POUR LES TESTS, A SUPPRIMER A LA FIN !!
+        View logoTest = findViewById(R.id.txtTitre);
         if (logoTest != null) {
             logoTest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Raccourci magique : on lance le jeu directement !
                     Intent intent = new Intent(MainActivity.this, Jeu.class);
                     startActivity(intent);
                 }
@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         btnRegles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Un Intent pour aller de MainActivity vers ReglesActivity
                 android.content.Intent intent = new android.content.Intent(MainActivity.this, ReglesActivity.class);
                 startActivity(intent);
             }

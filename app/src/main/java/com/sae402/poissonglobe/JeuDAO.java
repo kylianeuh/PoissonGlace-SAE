@@ -1,4 +1,6 @@
-package com.sae402.poissonglobe;import androidx.room.Dao;
+package com.sae402.poissonglobe;
+
+import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -27,7 +29,7 @@ public interface JeuDAO {
 
     // --- JOUEUR_PARTIE (Lien & Scores) ---
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertJoueurPartie(JoueurPartieBD joueurPartie);
 
     @Query("SELECT * FROM JoueurPartieBD WHERE joueur_id = :jId")

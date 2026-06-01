@@ -14,7 +14,8 @@
         android:layout_weight="1.5"
         android:text="Moi"
         android:textColor="#FFFFFF"
-        android:textStyle="bold"/>
+        android:textSize="48sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvMatchScore"
@@ -24,7 +25,8 @@
         android:gravity="center"
         android:text="5 - 3"
         android:textColor="#FFD700"
-        android:textStyle="bold"/>
+        android:textSize="48sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvMatchAdv"
@@ -33,5 +35,6 @@
         android:layout_weight="1.5"
         android:gravity="end"
         android:text="Adversaire"
-        android:textColor="#FFFFFF"/>
+        android:textColor="#FFFFFF"
+        android:textSize="48sp" />
 </LinearLayout>

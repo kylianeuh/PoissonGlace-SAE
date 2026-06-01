@@ -142,7 +142,21 @@ public class GameView extends View {
         pinceauSymbolePauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
         pinceauSymbolePauseBordure.setStrokeJoin(Paint.Join.ROUND);
 
-        imgPoissonGlobe = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_brown);
+        androidx.core.content.res.ResourcesCompat.getDrawable(context.getResources(), R.drawable.fish_brown, null);
+        android.graphics.drawable.Drawable drawablePoisson = androidx.core.content.res.ResourcesCompat.getDrawable(context.getResources(), R.drawable.fish_brown, null);
+
+        if (drawablePoisson != null) {
+            // On crée un Bitmap vide aux dimensions natives du SVG
+            imgPoissonGlobe = Bitmap.createBitmap(
+                    drawablePoisson.getIntrinsicWidth(),
+                    drawablePoisson.getIntrinsicHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
+            // On force le SVG à se dessiner à l'intérieur de ce Bitmap
+            Canvas canvasTmp = new Canvas(imgPoissonGlobe);
+            drawablePoisson.setBounds(0, 0, canvasTmp.getWidth(), canvasTmp.getHeight());
+            drawablePoisson.draw(canvasTmp);
+        }
 
         rectangleButGauche = new RectF();
         rectangleButDroite = new RectF();

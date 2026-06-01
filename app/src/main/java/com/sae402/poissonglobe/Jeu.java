@@ -21,17 +21,17 @@ public class Jeu extends AppCompatActivity {
             int nbJoueurs = getIntent().getIntExtra("NB_JOUEURS", 2);
             terrainJeu.nombreDeJoueursConfig = nbJoueurs;
 
-            // Récupération des pseudos (avec sécurité si null)
+            // PROTECTION ANTI-NULL : Valeurs par défaut directes si les extras reviennent vides
             String j1 = getIntent().getStringExtra("J1_NOM");
             String j2 = getIntent().getStringExtra("J2_NOM");
-            terrainJeu.nomJoueurGau = (j1 != null) ? j1 : "Joueur 1";
-            terrainJeu.nomJoueurDro = (j2 != null) ? j2 : "Joueur 2";
+            terrainJeu.nomJoueurGau = (j1 != null && !j1.isEmpty()) ? j1 : "Joueur 1";
+            terrainJeu.nomJoueurDro = (j2 != null && !j2.isEmpty()) ? j2 : "Joueur 2";
 
             if (nbJoueurs == 4) {
                 String j3 = getIntent().getStringExtra("J3_NOM");
                 String j4 = getIntent().getStringExtra("J4_NOM");
-                terrainJeu.nomJoueurGau2 = (j3 != null) ? j3 : "Joueur 3";
-                terrainJeu.nomJoueurDro2 = (j4 != null) ? j4 : "Joueur 4";
+                terrainJeu.nomJoueurGau2 = (j3 != null && !j3.isEmpty()) ? j3 : "Joueur 3";
+                terrainJeu.nomJoueurDro2 = (j4 != null && !j4.isEmpty()) ? j4 : "Joueur 4";
             }
 
             // Gestion de l'événement d'arbitrage de fin de partie
@@ -99,6 +99,16 @@ public class Jeu extends AppCompatActivity {
                     });
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Libération de la mémoire du SoundPool pour éviter les fuites de ressources en tâche de fond
+        GameView terrainJeu = findViewById(R.id.calqueJeu);
+        if (terrainJeu != null) {
+            terrainJeu.couperLesSons();
         }
     }
 }

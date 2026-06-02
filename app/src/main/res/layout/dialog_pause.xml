@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:fontFamily="@font/cherry_bomb"
-        android:text="PARTIE EN PAUSE"
+        android:text="@string/titre_pause"
         android:textColor="#FFFFFF"
         android:textSize="65sp" />
 
@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/cherry_bomb"
-        android:text="Que voulez-vous faire ?"
+        android:text="@string/question_pause"
         android:textColor="#FFFFFF"
         android:textSize="40sp"
         android:layout_marginBottom="25dp"/>
@@ -46,7 +46,7 @@
             android:focusable="true"
             android:fontFamily="@font/cherry_bomb"
             android:padding="15dp"
-            android:text="QUITTER"
+            android:text="@string/btn_quitter"
             android:textColor="#BBFFFFFF"
             android:textSize="45sp" />
 
@@ -63,7 +63,7 @@
             android:focusable="true"
             android:fontFamily="@font/cherry_bomb"
             android:padding="15dp"
-            android:text="REPRENDRE"
+            android:text="@string/btn_reprendre"
             android:textColor="#FFFFFF"
             android:textSize="45sp" />
 

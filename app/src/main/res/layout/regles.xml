@@ -14,7 +14,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/cherry_bomb"
         android:paddingHorizontal="20dp"
-        android:text="Règles du jeu"
+        android:text="@string/regles_du_jeu"
         android:textColor="#FFD700"
         android:textSize="60sp"
         android:textStyle="bold"
@@ -46,7 +46,7 @@
             android:gravity="center_vertical"
             android:padding="24dp"
             android:paddingHorizontal="5dp"
-            android:text="Glissez votre doigt, visez juste et poussez le poisson globe sur la terre ferme pour l'emporter.\n\n Mode Solo : 1 contre 1             Mode Équipe : 2 contre 2\n\nChaque joueur (ou équipe) contrôle une bulle directement sur l'écran à l'aide de son doigt.\n\nUtilisez votre bulle pour percuter, contrer et propulser le poisson globe (le palet).\n\nLe but est d'envoyer le poisson globe dans le camp adverse, précisément derrière la ligne de terre marron (les buts).\n\nChaque manche se joue avec un total de 10 poissons globes maximum. \n\nChaque fois qu'un poisson globe traverse la ligne de terre marron adverse, vous marquez 1 point. \n\nLe premier joueur ou la première équipe à atteindre 5 points gagne la manche."
+            android:text="@string/regles"
             android:textColor="#FFFFFF"
             android:textSize="34sp" />
 
@@ -63,7 +63,7 @@
         android:focusable="true"
         android:fontFamily="@font/cherry_bomb"
         android:gravity="center"
-        android:text="Retour"
+        android:text="@string/retour"
         android:textColor="#FFD700"
         android:textSize="40sp"
         android:textStyle="bold"

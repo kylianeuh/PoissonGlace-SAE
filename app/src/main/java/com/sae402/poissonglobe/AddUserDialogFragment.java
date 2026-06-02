@@ -1,15 +1,15 @@
 package com.sae402.poissonglobe;
 
-import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 public class AddUserDialogFragment extends DialogFragment {
@@ -18,45 +18,61 @@ public class AddUserDialogFragment extends DialogFragment {
         void onUserAdded();
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.dialog_add_user, container, false);
 
-        View view = inflater.inflate(R.layout.dialog_add_user, null);
-        builder.setView(view);
+        // CONFIGURATION CORRECTE DE LA FENÊTRE VIA LA MÉTHODE
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        AlertDialog dialog = builder.create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            // CORRECTION ICI : Utilisation de la méthode setSoftInputMode
+            getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
 
         EditText editPseudo = view.findViewById(R.id.edit_pseudo);
+
+        if (editPseudo != null) {
+            editPseudo.setFocusable(true);
+            editPseudo.setFocusableInTouchMode(true);
+            editPseudo.requestFocus();
+        }
+
         View btnAnnuler = view.findViewById(R.id.btn_dialog_annuler);
         View btnCreer = view.findViewById(R.id.btn_dialog_creer);
 
-        btnAnnuler.setOnClickListener(v -> dialog.dismiss());
+        btnAnnuler.setOnClickListener(v -> dismiss());
 
         btnCreer.setOnClickListener(v -> {
-            String pseudo = editPseudo.getText().toString().trim();
+            if (editPseudo != null) {
+                String pseudo = editPseudo.getText().toString().trim();
 
-            if (!pseudo.isEmpty()) {
-                JoueurBD nouveauJoueur = new JoueurBD();
-                nouveauJoueur.nom = pseudo;
+                if (!pseudo.isEmpty()) {
+                    JoueurBD nouveauJoueur = new JoueurBD();
+                    nouveauJoueur.nom = pseudo;
 
-                AppDatabase db = AppDatabase.getAppDatabase(requireContext());
-                db.getJeuDAO().insertJoueur(nouveauJoueur);
+                    AppDatabase db = AppDatabase.getAppDatabase(requireContext());
+                    db.getJeuDAO().insertJoueur(nouveauJoueur);
 
-                if (getParentFragment() instanceof OnUserAddedListener) {
-                    ((OnUserAddedListener) getParentFragment()).onUserAdded();
+                    if (getParentFragment() instanceof OnUserAddedListener) {
+                        ((OnUserAddedListener) getParentFragment()).onUserAdded();
+                    }
+
+                    dismiss();
                 }
-
-                dialog.dismiss();
             }
         });
 
-        return dialog;
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            int largeurPixels = (int) (750 * getResources().getDisplayMetrics().density);
+            getDialog().getWindow().setLayout(largeurPixels, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 }

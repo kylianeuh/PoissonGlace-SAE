@@ -3,41 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="30dp"
-    android:layout_margin="10dp"
-    android:background="#70BEE9"
+    android:paddingHorizontal="40dp"
+    android:paddingVertical="35dp"
+    android:background="@drawable/bouton_arrondi_bordure"
+    android:backgroundTint="#70BEE9"
     android:gravity="center_horizontal">
 
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/text_titre_profil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="25dp"
         android:fontFamily="@font/cherry_bomb"
-        android:text="Créer un nouveau profil"
+        android:text="@string/titre_creer_profil"
         android:textColor="#FFFFFF"
-        android:textSize="60sp" />
+        android:textSize="55sp" />
 
     <EditText
         android:id="@+id/edit_pseudo"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:background="@android:color/transparent"
         android:fontFamily="@font/cherry_bomb"
         android:gravity="center"
-        android:hint="Entrez votre pseudo"
+        android:hint="@string/hint_pseudo"
         android:inputType="textPersonName"
         android:maxLength="15"
         android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:textSize="45dp" />
+        android:textColorHint="#E0FFFFFF"
+        android:textSize="40sp"
+        android:focusable="true"
+        android:clickable="true"
+        android:focusableInTouchMode="true" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#FFFFFF"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,31 +49,31 @@
         android:orientation="horizontal"
         android:gravity="end">
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:id="@+id/btn_dialog_annuler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cherry_bomb"
-            android:padding="12dp"
-            android:text="ANNULER"
-            android:textColor="#BBFFFFFF"
-            android:textSize="40sp" />
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/btn_dialog_annuler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/cherry_bomb"
+        android:padding="12dp"
+        android:text="@string/btn_annuler"
+        android:textColor="#BBFFFFFF"
+        android:textSize="40sp" />
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:id="@+id/btn_dialog_creer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cherry_bomb"
-            android:padding="12dp"
-            android:text="CRÉER"
-            android:textColor="#FFFFFF"
-            android:textSize="50sp" />
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/btn_dialog_creer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/cherry_bomb"
+        android:padding="12dp"
+        android:text="@string/btn_creer"
+        android:textColor="#FFFFFF"
+        android:textSize="45sp" />
 
-    </LinearLayout>
+</LinearLayout>
 
 </LinearLayout>

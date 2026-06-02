@@ -18,7 +18,7 @@
         android:focusable="true"
         android:fontFamily="@font/cherry_bomb"
         android:gravity="center"
-        android:text="Retour"
+        android:text="@string/retour"
         android:textColor="#FFD700"
         android:textSize="40sp"
         android:textStyle="bold"
@@ -32,7 +32,7 @@
         android:layout_marginTop="40dp"
         android:fontFamily="@font/cherry_bomb"
         android:paddingHorizontal="20dp"
-        android:text="STATISTIQUES"
+        android:text="@string/statistiques"
         android:textColor="#FFD700"
         android:textSize="60sp"
         android:textStyle="bold"
@@ -62,7 +62,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/cherry_bomb"
-            android:text="Dernières parties"
+            android:text="@string/derni_res_parties"
             android:textColor="#FFFFFF"
             android:textSize="55sp" />
 
@@ -98,7 +98,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="32dp"
             android:fontFamily="@font/cherry_bomb"
-            android:text="Statistiques globales"
+            android:text="@string/statistiques_globales"
             android:textColor="#FFFFFF"
             android:textSize="55sp" />
 
@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:fontFamily="@font/cherry_bomb"
-            android:text="Nombre de parties jouées : 0"
+            android:text=""
             android:textColor="#FFFFFF"
             android:textSize="34sp" />
 
@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:fontFamily="@font/cherry_bomb"
-            android:text="Nombre de parties gagnées : 0"
+            android:text=""
             android:textColor="#FFFFFF"
             android:textSize="34sp" />
 
@@ -127,7 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/cherry_bomb"
-            android:text="Nombre de points au total : 0"
+            android:text=""
             android:textColor="#FFFFFF"
             android:textSize="34sp" />
     </LinearLayout>

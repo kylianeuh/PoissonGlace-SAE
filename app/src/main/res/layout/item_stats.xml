@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1.5"
-        android:text="Moi"
+        android:text=""
         android:textColor="#FFFFFF"
         android:textSize="48sp"
         android:textStyle="bold" />
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="5 - 3"
+        android:text=""
         android:textColor="#FFD700"
         android:textSize="48sp"
         android:textStyle="bold" />
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1.5"
         android:gravity="end"
-        android:text="Adversaire"
+        android:text=""
         android:textColor="#FFFFFF"
         android:textSize="48sp" />
 </LinearLayout>

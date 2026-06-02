@@ -14,8 +14,6 @@ public class PoissonGlobe {
         this.vitesseY = 0f;
     }
 
-    // Remplacement dans PoissonGlobe.java
     public void update(float largeurTerrain, float hauteurTerrain) {
-
     }
 }

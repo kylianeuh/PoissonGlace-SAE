@@ -1,23 +1,20 @@
 package com.sae402.poissonglobe;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
 public class GameView extends View {
-
-    // =======================================================================
-    // --- CONFIGURATION GLOBALE ET CALIBRATION DE LA PHYSIQUE (STATIC) ---
-    // =======================================================================
 
     public static float FACTEUR_TAILLE_POISSON = 0.08f;
     public static float CONFIG_HITBOX_POISSON_RAYON = 0.70f;
@@ -29,9 +26,8 @@ public class GameView extends View {
     public static float CONFIG_HITBOX_BULLE_DECALAGE_X = 0f;
     public static float CONFIG_HITBOX_BULLE_DECALAGE_Y = 0f;
 
-    // --- CONSTANTES DE PHYSIQUE AJUSTÉES ---
-    public static float FRICTION_TERRAIN = 0.98f;          // Friction pour le poisson globe
-    public static float FRICTION_BULLES = 0.96f;           // Inertie des bulles quand on les lâche (0.96 = glisse bien)
+    public static float FRICTION_TERRAIN = 0.98f;
+    public static float FRICTION_BULLES = 0.96f;
     public static float CONFIG_RESTITUTION = 0.96f;
     public static float CONFIG_MULT_FORCE_DOIGT = 1.8f;
     public static float CONFIG_VITESSE_MIN_DOIGT = 0.5f;
@@ -63,8 +59,6 @@ public class GameView extends View {
     private android.media.SoundPool soundPool;
     private final int[] sonBulles = new int[5];
     private final int[] sonBords = new int[5];
-    private int[] sonBulles = new int[5];
-    private int[] sonBords = new int[5];
     private int sonBut;
     private boolean sonsChargés = false;
 
@@ -86,12 +80,12 @@ public class GameView extends View {
     public Bulle bulleJoueur3;
     public Bulle bulleJoueur4;
 
-    private Bitmap imgPoissonGlobe;
+    private Drawable svgPoissonGlobe;
 
     private float positionYTextes, margeExtremite, ecartScore, correctionYScore;
     private boolean initialisationFaite = false;
 
-    private android.os.Handler jeuHandler = new android.os.Handler();
+    private final android.os.Handler jeuHandler = new android.os.Handler();
     private Runnable boucleJeu;
     private final int FPS = 60;
 
@@ -101,8 +95,6 @@ public class GameView extends View {
     private int idDoigtJ4 = -1;
 
     private boolean partieTerminee = false;
-
-    // NOUVEAU : Variable d'état de pause
     private boolean jeuEnPause = false;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
@@ -110,7 +102,6 @@ public class GameView extends View {
         initialiserTerrain(context);
     }
 
-    // NOUVEAU : Interfaces d'écoute pour la gestion de la fin de partie et de la pause
     public interface OnGameOverListener {
         void onGameOver(String pseudoVainqueur);
     }
@@ -167,7 +158,6 @@ public class GameView extends View {
         pinceauTexteContour.setStyle(Paint.Style.STROKE);
         pinceauTexteContour.setStrokeWidth(12f);
         pinceauTexteContour.setStrokeJoin(Paint.Join.ROUND);
-        pinceauTexteContour.setTextAlign(Paint.Align.CENTER);
         pinceauTexteContour.setAntiAlias(true);
 
         pinceauTexteJaune = new Paint();
@@ -176,7 +166,6 @@ public class GameView extends View {
         pinceauTexteJaune.setTextSize(65f);
         pinceauTexteJaune.setStyle(Paint.Style.FILL);
         pinceauTexteJaune.setAntiAlias(true);
-        pinceauTexteJaune.setTextAlign(Paint.Align.CENTER);
 
         pinceauBoutonPause = createPaint(Color.parseColor("#6622A7F0"), Paint.Style.FILL, 0f);
         pinceauBoutonPauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 8f);
@@ -185,15 +174,11 @@ public class GameView extends View {
         pinceauSymbolePauseBordure = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
         pinceauSymbolePauseBordure.setStrokeJoin(Paint.Join.ROUND);
 
-        android.graphics.drawable.Drawable drawablePoisson = ResourcesCompat.getDrawable(context.getResources(), R.drawable.fish_brown, null);
-        if (drawablePoisson != null) {
-            int width = drawablePoisson.getIntrinsicWidth() <= 0 ? 200 : drawablePoisson.getIntrinsicWidth();
-            int height = drawablePoisson.getIntrinsicHeight() <= 0 ? 200 : drawablePoisson.getIntrinsicHeight();
-            imgPoissonGlobe = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            Canvas canvasTmp = new Canvas(imgPoissonGlobe);
-            drawablePoisson.setBounds(0, 0, canvasTmp.getWidth(), canvasTmp.getHeight());
-            drawablePoisson.draw(canvasTmp);
-        }
+        svgPoissonGlobe = ResourcesCompat.getDrawable(
+                context.getResources(),
+                R.drawable.fish_brown,
+                null
+        );
 
         rectangleButGauche = new RectF();
         rectangleButDroite = new RectF();
@@ -205,11 +190,10 @@ public class GameView extends View {
         boucleJeu = new Runnable() {
             @Override
             public void run() {
-                // MODIFICATION : On ne met à jour la physique que si le jeu N'EST PAS en pause
                 if (initialisationFaite && !partieTerminee && !jeuEnPause) {
                     gererPhysiqueEtArbitrage();
                 }
-                invalidate(); // On continue de redessiner le terrain en arrière-plan
+                invalidate();
                 jeuHandler.postDelayed(this, 1000 / FPS);
             }
         };
@@ -248,10 +232,17 @@ public class GameView extends View {
 
         poissonGlobe = new PoissonGlobe(centreX, centreY, h * 0.08f);
 
-        bulleJoueur1 = new Bulle(w * 0.25f, centreY, h * 0.13f);
-        bulleJoueur2 = new Bulle(w * 0.75f, centreY, h * 0.13f);
-        bulleJoueur3 = new Bulle(w * 0.15f, centreY, h * 0.13f);
-        bulleJoueur4 = new Bulle(w * 0.85f, centreY, h * 0.13f);
+        if (nombreDeJoueursConfig == 4) {
+            bulleJoueur1 = new Bulle(w * 0.25f, h * 0.33f, h * 0.13f);
+            bulleJoueur3 = new Bulle(w * 0.25f, h * 0.66f, h * 0.13f);
+            bulleJoueur2 = new Bulle(w * 0.75f, h * 0.33f, h * 0.13f);
+            bulleJoueur4 = new Bulle(w * 0.75f, h * 0.66f, h * 0.13f);
+        } else {
+            bulleJoueur1 = new Bulle(w * 0.25f, centreY, h * 0.13f);
+            bulleJoueur2 = new Bulle(w * 0.75f, centreY, h * 0.13f);
+            bulleJoueur3 = new Bulle(w * 0.10f, centreY, h * 0.13f);
+            bulleJoueur4 = new Bulle(w * 0.90f, centreY, h * 0.13f);
+        }
 
         float hauteurBut = h / 3f;
         float epaisseurBut = 40f;
@@ -281,7 +272,7 @@ public class GameView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
         int hauteur = getHeight();
@@ -302,14 +293,14 @@ public class GameView extends View {
         bulleJoueur3.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
         bulleJoueur4.rayon = rayonVisuelBulle * CONFIG_HITBOX_BULLE_RAYON;
 
-        if (imgPoissonGlobe != null) {
-            RectF positionPoisson = new RectF(
-                    poissonGlobe.x - rayonVisuelPoisson,
-                    poissonGlobe.y - rayonVisuelPoisson,
-                    poissonGlobe.x + rayonVisuelPoisson,
-                    poissonGlobe.y + rayonVisuelPoisson
-            );
-            canvas.drawBitmap(imgPoissonGlobe, null, positionPoisson, null);
+        if (svgPoissonGlobe != null) {
+            int gauche = (int) (poissonGlobe.x - rayonVisuelPoisson);
+            int haut   = (int) (poissonGlobe.y - rayonVisuelPoisson);
+            int droite = (int) (poissonGlobe.x + rayonVisuelPoisson);
+            int bas    = (int) (poissonGlobe.y + rayonVisuelPoisson);
+
+            svgPoissonGlobe.setBounds(gauche, haut, droite, bas);
+            svgPoissonGlobe.draw(canvas);
         }
 
         Paint pinceauCorpsBulle = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -366,12 +357,10 @@ public class GameView extends View {
         if (!partieTerminee) {
             if (scoreJoueurGau >= 6 || scoreJoueurDro >= 6) {
                 partieTerminee = true;
-
                 String vainqueur;
                 if (scoreJoueurGau >= 6) {
                     vainqueur = (nombreDeJoueursConfig == 4) ? nomJoueurGau + " & " + nomJoueurGau2 : nomJoueurGau;
                 } else {
-                    navigator_vainqueur:
                     vainqueur = (nombreDeJoueursConfig == 4) ? nomJoueurDro + " & " + nomJoueurDro2 : nomJoueurDro;
                 }
 
@@ -395,7 +384,6 @@ public class GameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // NOUVEAU : Si le jeu est en pause, on bloque TOUS les mouvements tactiles immédiatement
         if (jeuEnPause) return false;
 
         int action = event.getActionMasked();
@@ -409,7 +397,6 @@ public class GameView extends View {
             float dx = touchX - pauseBtnX;
             float dy = touchY - pauseBtnY;
             if ((dx * dx + dy * dy) <= (pauseBtnRadius * pauseBtnRadius)) {
-                // MODIFICATION : Déclenchement de la pause
                 declencherPauseInterne();
                 return true;
             }
@@ -449,7 +436,6 @@ public class GameView extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL:
-                // MODIFICATION : Au lieu d'appeler reinitialiserVitesse(), on laisse la bulle libre de glisser
                 if (idPointeur == idDoigtJ1) idDoigtJ1 = -1;
                 else if (idPointeur == idDoigtJ2) idDoigtJ2 = -1;
                 else if (idPointeur == idDoigtJ3) idDoigtJ3 = -1;
@@ -459,24 +445,20 @@ public class GameView extends View {
         return true;
     }
 
-    // NOUVEAU : Méthode interne pour verrouiller le moteur et notifier l'activité
     private void declencherPauseInterne() {
         this.jeuEnPause = true;
 
-        // On relâche de force tous les doigts connectés pour éviter que les bulles se téléportent à la reprise
         idDoigtJ1 = -1; idDoigtJ2 = -1; idDoigtJ3 = -1; idDoigtJ4 = -1;
         bulleJoueur1.reinitialiserVitesse();
         bulleJoueur2.reinitialiserVitesse();
         if (bulleJoueur3 != null) bulleJoueur3.reinitialiserVitesse();
         if (bulleJoueur4 != null) bulleJoueur4.reinitialiserVitesse();
 
-        // On appelle le listener pour que l'Activité affiche le Pop-up
         if (pauseRequestedListener != null) {
             pauseRequestedListener.onPauseRequested();
         }
     }
 
-    // NOUVEAU : Méthode publique appelée par ton Pop-up pour relancer le match
     public void reprendreJeu() {
         this.jeuEnPause = false;
     }
@@ -485,7 +467,6 @@ public class GameView extends View {
         int largeur = getWidth();
         int hauteur = getHeight();
 
-        // 1. Calculer la vitesse des bulles contrôlées par un doigt
         if (idDoigtJ1 != -1) bulleJoueur1.calculerVitesse();
         if (idDoigtJ2 != -1) bulleJoueur2.calculerVitesse();
         if (nombreDeJoueursConfig == 4) {
@@ -494,11 +475,9 @@ public class GameView extends View {
         }
 
         for (int step = 0; step < PHYSIQUE_SUB_STEPS; step++) {
-            // Déplacement du poisson globe
             poissonGlobe.x += (poissonGlobe.vitesseX / PHYSIQUE_SUB_STEPS);
             poissonGlobe.y += (poissonGlobe.vitesseY / PHYSIQUE_SUB_STEPS);
 
-            // MODIFICATION INERTIE : Déplacement autonome des bulles lâchées (sans doigt)
             if (idDoigtJ1 == -1) { bulleJoueur1.x += (bulleJoueur1.vX / PHYSIQUE_SUB_STEPS); bulleJoueur1.y += (bulleJoueur1.vY / PHYSIQUE_SUB_STEPS); }
             if (idDoigtJ2 == -1) { bulleJoueur2.x += (bulleJoueur2.vX / PHYSIQUE_SUB_STEPS); bulleJoueur2.y += (bulleJoueur2.vY / PHYSIQUE_SUB_STEPS); }
             if (nombreDeJoueursConfig == 4) {
@@ -506,11 +485,9 @@ public class GameView extends View {
                 if (idDoigtJ4 == -1) { bulleJoueur4.x += (bulleJoueur4.vX / PHYSIQUE_SUB_STEPS); bulleJoueur4.y += (bulleJoueur4.vY / PHYSIQUE_SUB_STEPS); }
             }
 
-            // Gestion des limites du terrain et rebonds sur les bordures
             gererMursEtButsEtape(largeur, hauteur);
             gererRebondsMursPourBulles(largeur, hauteur);
 
-            // Collisions d'impact
             calculerCollisionBullePoisson(bulleJoueur1);
             calculerCollisionBullePoisson(bulleJoueur2);
             if (nombreDeJoueursConfig == 4) {
@@ -521,7 +498,6 @@ public class GameView extends View {
             }
         }
 
-        // Application de la friction environnementale (décélération naturelle)
         poissonGlobe.vitesseX *= FRICTION_TERRAIN;
         poissonGlobe.vitesseY *= FRICTION_TERRAIN;
 
@@ -532,12 +508,10 @@ public class GameView extends View {
             if (idDoigtJ4 == -1) { bulleJoueur4.vX *= FRICTION_BULLES; bulleJoueur4.vY *= FRICTION_BULLES; }
         }
 
-        // Speed caps de sécurité
         limiterVitessePoisson();
     }
 
     private void gererRebondsMursPourBulles(int largeur, int hauteur) {
-        // CORRECTION CRITIQUE ANTI-TRAVERSEE : On force les bulles à rester dans leur camp strict avec rebond
         Bulle[] campGauche = (nombreDeJoueursConfig == 4) ? new Bulle[]{bulleJoueur1, bulleJoueur3} : new Bulle[]{bulleJoueur1};
         Bulle[] campDroit = (nombreDeJoueursConfig == 4) ? new Bulle[]{bulleJoueur2, bulleJoueur4} : new Bulle[]{bulleJoueur2};
 
@@ -545,7 +519,6 @@ public class GameView extends View {
             if (b.y - b.rayon < 0) { b.y = b.rayon; b.vY = -b.vY * CONFIG_RESTITUTION; }
             else if (b.y + b.rayon > hauteur) { b.y = hauteur - b.rayon; b.vY = -b.vY * CONFIG_RESTITUTION; }
             if (b.x - b.rayon < 0) { b.x = b.rayon; b.vX = -b.vX * CONFIG_RESTITUTION; }
-            // Blocage absolu à la ligne centrale
             else if (b.x + b.rayon > ligneCentraleX) { b.x = ligneCentraleX - b.rayon; b.vX = -b.vX * CONFIG_RESTITUTION; }
         }
 
@@ -553,7 +526,6 @@ public class GameView extends View {
             if (b.y - b.rayon < 0) { b.y = b.rayon; b.vY = -b.vY * CONFIG_RESTITUTION; }
             else if (b.y + b.rayon > hauteur) { b.y = hauteur - b.rayon; b.vY = -b.vY * CONFIG_RESTITUTION; }
             if (b.x + b.rayon > largeur) { b.x = largeur - b.rayon; b.vX = -b.vX * CONFIG_RESTITUTION; }
-            // Blocage absolu à la ligne centrale
             else if (b.x - b.rayon < ligneCentraleX) { b.x = ligneCentraleX + b.rayon; b.vX = -b.vX * CONFIG_RESTITUTION; }
         }
     }
@@ -604,7 +576,6 @@ public class GameView extends View {
             b1.x += normalX * chevauchement; b1.y += normalY * chevauchement;
             b2.x -= normalX * chevauchement; b2.y -= normalY * chevauchement;
 
-            // Correction anti-téléportation trans-camp lors des poussées d'équipe
             b1.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, true);
             b2.contraindreDansLimites(getWidth(), getHeight(), ligneCentraleX, b2 == bulleJoueur3);
         }
@@ -622,14 +593,32 @@ public class GameView extends View {
         int largeur = getWidth();
         int hauteur = getHeight();
 
+        poissonGlobe.x = largeur / 2f;
         poissonGlobe.y = hauteur / 2f;
-        poissonGlobe.vitesseX = 0; poissonGlobe.vitesseY = 0;
-        poissonGlobe.x = auJoueur2 ? (largeur * 0.70f) : (largeur * 0.30f);
+        poissonGlobe.vitesseX = 0;
+        poissonGlobe.vitesseY = 0;
 
-        bulleJoueur1.x = largeur * 0.25f; bulleJoueur1.y = hauteur * 0.35f;
-        bulleJoueur2.x = largeur * 0.75f; bulleJoueur2.y = hauteur * 0.35f;
-        bulleJoueur3.x = largeur * 0.15f; bulleJoueur3.y = hauteur * 0.65f;
-        bulleJoueur4.x = largeur * 0.85f; bulleJoueur4.y = hauteur * 0.65f;
+        if (nombreDeJoueursConfig == 4) {
+            bulleJoueur1.x = largeur * 0.25f;
+            bulleJoueur1.y = hauteur * 0.33f;
+            bulleJoueur3.x = largeur * 0.25f;
+            bulleJoueur3.y = hauteur * 0.66f;
+
+            bulleJoueur2.x = largeur * 0.75f;
+            bulleJoueur2.y = hauteur * 0.33f;
+            bulleJoueur4.x = largeur * 0.75f;
+            bulleJoueur4.y = hauteur * 0.66f;
+
+        } else {
+
+            bulleJoueur1.x = largeur * 0.25f;
+            bulleJoueur1.y = hauteur / 2f;
+            bulleJoueur2.x = largeur * 0.75f;
+            bulleJoueur2.y = hauteur / 2f;
+
+            bulleJoueur3.x = largeur * 0.10f; bulleJoueur3.y = hauteur * 0.50f;
+            bulleJoueur4.x = largeur * 0.90f; bulleJoueur4.y = hauteur * 0.50f;
+        }
 
         idDoigtJ1 = -1; idDoigtJ2 = -1; idDoigtJ3 = -1; idDoigtJ4 = -1;
         bulleJoueur1.reinitialiserVitesse();

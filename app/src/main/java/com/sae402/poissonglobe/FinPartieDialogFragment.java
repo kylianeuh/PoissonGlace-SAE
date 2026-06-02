@@ -41,7 +41,7 @@ public class FinPartieDialogFragment extends DialogFragment {
         View btnAccueil = view.findViewById(R.id.btn_dialog_accueil);
 
         if (txtVictoire != null) {
-            txtVictoire.setText("Victoire de " + vainqueur + " !");
+            txtVictoire.setText(getString(R.string.format_victoire, vainqueur));
         }
 
         if (txtEquipeGau != null) {

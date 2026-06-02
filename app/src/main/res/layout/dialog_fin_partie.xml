@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="850dp" android:layout_height="wrap_content"
+    android:layout_width="850dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="35dp"
     android:background="@drawable/bouton_arrondi_bordure"
-    android:backgroundTint="#70BEE9" android:gravity="center_horizontal">
+    android:backgroundTint="#70BEE9"
+    android:gravity="center_horizontal">
 
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/txt_titre_termine"
@@ -12,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:fontFamily="@font/cherry_bomb"
-        android:text="MATCH TERMINÉ !"
+        android:text="@string/titre_termine"
         android:textColor="#FFFFFF"
         android:textSize="55sp" />
 
@@ -23,7 +25,7 @@
         android:layout_marginBottom="25dp"
         android:fontFamily="@font/cherry_bomb"
         android:gravity="center"
-        android:text="Victoire de Joueur 1 !"
+        android:text=""
         android:textColor="#FFCC00"
         android:textSize="65sp" />
 
@@ -41,18 +43,20 @@
             android:layout_weight="1"
             android:fontFamily="@font/cherry_bomb"
             android:gravity="end"
-            android:text="J1 + J3"
+            android:text=""
             android:textColor="#FFFFFF"
-            android:textSize="40sp" /> <com.sae402.poissonglobe.PoissonGlaceTextView
-        android:id="@+id/txt_popup_scores"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30dp"
-        android:fontFamily="@font/cherry_bomb"
-        android:gravity="center"
-        android:text="6 - 4"
-        android:textColor="#FFCC00"
-        android:textSize="60sp" />
+            android:textSize="40sp" />
+
+        <com.sae402.poissonglobe.PoissonGlaceTextView
+            android:id="@+id/txt_popup_scores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:fontFamily="@font/cherry_bomb"
+            android:gravity="center"
+            android:text=" - "
+            android:textColor="#FFCC00"
+            android:textSize="60sp" />
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:id="@+id/txt_popup_equipe_droite"
@@ -61,7 +65,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/cherry_bomb"
             android:gravity="start"
-            android:text="J2 + J4"
+            android:text=""
             android:textColor="#FFFFFF"
             android:textSize="40sp" />
     </LinearLayout>
@@ -86,7 +90,7 @@
             android:focusable="true"
             android:fontFamily="@font/cherry_bomb"
             android:padding="12dp"
-            android:text="RETOUR À L'ACCUEIL"
+            android:text="@string/btn_accueil"
             android:textColor="#FFFFFF"
             android:textSize="45sp" />
     </LinearLayout>

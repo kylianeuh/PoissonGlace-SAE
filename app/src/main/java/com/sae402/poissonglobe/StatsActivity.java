@@ -20,6 +20,7 @@ public class StatsActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getAppDatabase(this);
         jeuDAO = db.getJeuDAO();
 
+        // Récupération initiale de la liste des joueurs
         listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
 
         chargerVueSelection();
@@ -29,7 +30,9 @@ public class StatsActivity extends AppCompatActivity {
         setContentView(R.layout.stats_selection);
 
         View btnRetour = findViewById(R.id.btnRetourDetails);
-        btnRetour.setOnClickListener(v -> finish());
+        if (btnRetour != null) {
+            btnRetour.setOnClickListener(v -> finish());
+        }
 
         RecyclerView rvChoixJoueurs = findViewById(R.id.rvChoixJoueurs);
 
@@ -40,40 +43,51 @@ public class StatsActivity extends AppCompatActivity {
             }
         });
 
-        rvChoixJoueurs.setAdapter(adapterSelection);
+        if (rvChoixJoueurs != null) {
+            rvChoixJoueurs.setAdapter(adapterSelection);
+        }
     }
 
     private void chargerVueDetails(String nomJoueur) {
         setContentView(R.layout.stats_details);
 
         TextView txtNomJoueur = findViewById(R.id.txtNomJoueur);
-        txtNomJoueur.setText(nomJoueur);
+        if (txtNomJoueur != null) {
+            txtNomJoueur.setText(nomJoueur);
+        }
 
         View btnRetour = findViewById(R.id.btnRetourDetails);
-        btnRetour.setOnClickListener(v -> chargerVueSelection());
+        if (btnRetour != null) {
+            btnRetour.setOnClickListener(v -> chargerVueSelection());
+        }
 
         TextView txtParties = findViewById(R.id.txtPartiesJouees);
         TextView txtGagnees = findViewById(R.id.txtPartiesGagnees);
         TextView txtPoints = findViewById(R.id.txtPointsTotal);
 
+        // Récupération de l'entité du joueur pour obtenir ses points totaux accumulés
         JoueurBD joueurSelectionne = jeuDAO.getJoueurByNom(nomJoueur);
 
-        int nbParties = 0;
-        int scoreAffichage = 0;
-
         if (joueurSelectionne != null) {
-            scoreAffichage = joueurSelectionne.scoreGlobal;
+            final int idJoueur = joueurSelectionne.id;
+            final int scoreGlobal = joueurSelectionne.scoreGlobal;
 
-            List<JoueurPartieBD> listeScores = jeuDAO.getScoresByJoueur(joueurSelectionne.id);
-            if (listeScores != null) {
-                nbParties = listeScores.size();
-            }
+            // INTELLIGENCE BDD : On exécute les calculs de stats en arrière-plan
+            new Thread(() -> {
+                // Utilisation des requêtes COUNT(*) de ton JeuDAO
+                int totalJouees = jeuDAO.getNombrePartiesJouees(idJoueur);
+                int totalVictoires = jeuDAO.getNombreVictoires(idJoueur);
+
+                // On renvoie les textes calculés sur le Thread de l'interface graphique
+                runOnUiThread(() -> {
+                    if (txtParties != null) txtParties.setText("Nombre de parties jouées : " + totalJouees);
+                    if (txtGagnees != null) txtGagnees.setText("Nombre de parties gagnées : " + totalVictoires);
+                    if (txtPoints != null) txtPoints.setText("Nombre de points au total : " + scoreGlobal);
+                });
+            }).start();
         }
 
-        txtParties.setText("Nombre de parties jouées : " + nbParties);
-        txtGagnees.setText("Nombre de parties gagnées : " + (nbParties / 2));
-        txtPoints.setText("Nombre de points au total : " + scoreAffichage);
-
+        // --- GESTION ET CHARGEMENT DU CLASSEMENT GENERAL ---
         ClassementFragment fragClassement = new ClassementFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.zoneClassement, fragClassement)

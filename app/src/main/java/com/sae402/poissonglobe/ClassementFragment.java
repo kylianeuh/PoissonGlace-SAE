@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager; // Vérifie bien cet import !
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,12 +26,13 @@ public class ClassementFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_classement, container, false);
 
         rvClassement = view.findViewById(R.id.rvClassement);
-
         rvClassement.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // Initialisation de l'adaptateur avec la liste (triée ou non)
         adapter = new ClassementAdapter(listeJoueurs);
         rvClassement.setAdapter(adapter);
 
+        // CORRECTION : Si des données ont été injectées avant la création de la vue, on force l'affichage
         if (!listeJoueurs.isEmpty()) {
             adapter.notifyDataSetChanged();
         }
@@ -39,12 +40,12 @@ public class ClassementFragment extends Fragment {
         return view;
     }
 
-
     public void majListeJoueurs(List<Joueur> nouveauxJoueurs) {
         if (nouveauxJoueurs != null) {
             this.listeJoueurs.clear();
             this.listeJoueurs.addAll(nouveauxJoueurs);
 
+            // Tri décroissant parfait
             Collections.sort(this.listeJoueurs, new Comparator<Joueur>() {
                 @Override
                 public int compare(Joueur j1, Joueur j2) {
@@ -52,6 +53,7 @@ public class ClassementFragment extends Fragment {
                 }
             });
 
+            // Si la vue est déjà prête, on rafraîchit le RecyclerView
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }

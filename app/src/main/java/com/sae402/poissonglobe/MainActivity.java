@@ -92,5 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
         // On envoie les vraies données au fragment de l'accueil
         fragmentClassement.majListeJoueurs(joueursPourClassement);
+
+        Intent intentMusique = new Intent(this, MusiqueService.class);
+        startService(intentMusique);
     }
 }

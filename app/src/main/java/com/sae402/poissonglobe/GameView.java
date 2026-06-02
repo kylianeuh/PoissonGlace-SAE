@@ -200,7 +200,7 @@ public class GameView extends View {
         jeuHandler.post(boucleJeu);
 
         pinceauBullesJoueurs = new Paint();
-        pinceauBullesJoueurs.setColor(Color.parseColor("#40E0D0"));
+        pinceauBullesJoueurs.setColor(Color.parseColor("#FFFFFF"));
         pinceauBullesJoueurs.setStyle(Paint.Style.STROKE);
         pinceauBullesJoueurs.setStrokeWidth(8f);
         pinceauBullesJoueurs.setAntiAlias(true);

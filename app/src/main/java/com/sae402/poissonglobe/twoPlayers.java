@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter; // Import manquant
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;import java.util.ArrayList;
+import androidx.fragment.app.Fragment;
+import java.util.ArrayList;
 import java.util.List;
 
 public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUserAddedListener {
@@ -19,13 +20,13 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {// Correction : "LayoutInflater inflater" (avec un espace)
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_two_players, container, false);
 
         spinnerJ1 = view.findViewById(R.id.spinnerJ1);
         spinnerJ2 = view.findViewById(R.id.spinnerJ2);
         View btnAddJ1 = view.findViewById(R.id.btnAddJ1);
-        View btnAddJ2 =view.findViewById(R.id.btnAddJ2);
+        View btnAddJ2 = view.findViewById(R.id.btnAddJ2);
 
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, nomsJoueurs);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -36,7 +37,7 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
         refreshSpinners();
 
         View.OnClickListener openDialogListener = v -> {
-            AddUserDialogFragment dialog= new AddUserDialogFragment();
+            AddUserDialogFragment dialog = new AddUserDialogFragment();
             dialog.show(getChildFragmentManager(), "AddUser");
         };
 
@@ -69,6 +70,7 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
                 if (textView != null) {
                     textView.setTextColor(android.graphics.Color.WHITE);
                     textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                    textView.setTextSize(30f);
                 }
                 return view;
             }
@@ -79,13 +81,28 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
                 android.widget.TextView textView = view.findViewById(android.R.id.text1);
 
                 if (textView != null) {
+                    // SOLUTION POUR LE TEXTE VIDE : On force le fond de la ligne en bleu ciel unifié
+                    view.setBackgroundColor(android.graphics.Color.parseColor("#22A7F0"));
+
                     textView.setTextColor(android.graphics.Color.WHITE);
                     textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                    textView.setTextSize(30f);
 
-                    int paddingHorizontal = (int) (16 * parent.getContext().getResources().getDisplayMetrics().density);
-                    int paddingVertical = (int) (12 * parent.getContext().getResources().getDisplayMetrics().density);
+                    int pHorizontal = (int) (24 * parent.getContext().getResources().getDisplayMetrics().density);
+                    textView.setPadding(pHorizontal, 0, pHorizontal, 0);
 
-                    textView.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+                    // Hauteur à 70dp pour que ce soit compact et ne déborde pas
+                    int hauteurPixels = (int) (70 * parent.getContext().getResources().getDisplayMetrics().density);
+
+                    ViewGroup.LayoutParams params = view.getLayoutParams();
+                    if (params == null) {
+                        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, hauteurPixels);
+                    } else {
+                        params.height = hauteurPixels;
+                    }
+                    view.setLayoutParams(params);
+
+                    textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
                 }
                 return view;
             }
@@ -95,6 +112,8 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
 
         spinnerJ1.setAdapter(adapter);
         spinnerJ2.setAdapter(adapter);
+
+        // TA VERSION D'AVANT POUR LES BORDURES BLANCHES (RESTAURÉE)
         android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
         border.setColor(android.graphics.Color.parseColor("#22A7F0"));
         border.setStroke(8, android.graphics.Color.WHITE);
@@ -117,7 +136,6 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 if (spinnerJ1.getSelectedItemPosition() == spinnerJ2.getSelectedItemPosition()) {
                     android.widget.Toast.makeText(requireContext(), "Ce joueur est déjà sélectionné par le Joueur 2 !", android.widget.Toast.LENGTH_SHORT).show();
-
                     if (position == 0 && parent.getCount() > 1) {
                         spinnerJ1.setSelection(1);
                     } else {
@@ -125,7 +143,6 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
                     }
                 }
             }
-
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
@@ -135,7 +152,6 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 if (spinnerJ2.getSelectedItemPosition() == spinnerJ1.getSelectedItemPosition()) {
                     android.widget.Toast.makeText(requireContext(), "Ce joueur est déjà sélectionné par le Joueur 1 !", android.widget.Toast.LENGTH_SHORT).show();
-
                     if (position == 0 && parent.getCount() > 1) {
                         spinnerJ2.setSelection(1);
                     } else {
@@ -143,12 +159,10 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
                     }
                 }
             }
-
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
     }
     public Spinner getSpinnerJ1() { return spinnerJ1; }
     public Spinner getSpinnerJ2() { return spinnerJ2; }
-
 }

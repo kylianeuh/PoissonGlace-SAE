@@ -9,7 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;import java.util.ArrayList;
+import androidx.fragment.app.Fragment;
+import java.util.ArrayList;
 import java.util.List;
 
 public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUserAddedListener {
@@ -23,7 +24,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_four_players, container, false);
 
-
         spinnerJ1 = view.findViewById(R.id.spinnerJ1);
         spinnerJ2 = view.findViewById(R.id.spinnerJ2);
         spinnerJ3 = view.findViewById(R.id.spinnerJ3);
@@ -32,7 +32,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         View btnAddJ2 = view.findViewById(R.id.btnAddJ2);
         View btnAddJ3 = view.findViewById(R.id.btnAddJ3);
         View btnAddJ4 = view.findViewById(R.id.btnAddJ4);
-
 
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, nomsJoueurs);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -44,7 +43,7 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
 
         refreshSpinners();
 
-        View.OnClickListener openDialogListener = v ->{
+        View.OnClickListener openDialogListener = v -> {
             AddUserDialogFragment dialog = new AddUserDialogFragment();
             dialog.show(getChildFragmentManager(), "AddUser");
         };
@@ -56,6 +55,7 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
 
         return view;
     }
+
     @Override
     public void onUserAdded() {
         refreshSpinners();
@@ -79,6 +79,7 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
                 if (textView != null) {
                     textView.setTextColor(android.graphics.Color.WHITE);
                     textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                    textView.setTextSize(30f);
                 }
                 return view;
             }
@@ -87,14 +88,29 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
             public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
                 android.widget.TextView textView = view.findViewById(android.R.id.text1);
+
                 if (textView != null) {
+                    // Les lignes individuelles restent en bleu uni sans grille blanche étrange
+                    view.setBackgroundColor(android.graphics.Color.parseColor("#22A7F0"));
+
                     textView.setTextColor(android.graphics.Color.WHITE);
                     textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                    textView.setTextSize(30f);
 
-                    int paddingHorizontal = (int) (16 * parent.getContext().getResources().getDisplayMetrics().density);
-                    int paddingVertical = (int) (12 * parent.getContext().getResources().getDisplayMetrics().density);
+                    int pHorizontal = (int) (24 * parent.getContext().getResources().getDisplayMetrics().density);
+                    textView.setPadding(pHorizontal, 0, pHorizontal, 0);
 
-                    textView.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+                    int hauteurPixels = (int) (70 * parent.getContext().getResources().getDisplayMetrics().density);
+
+                    ViewGroup.LayoutParams params = view.getLayoutParams();
+                    if (params == null) {
+                        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, hauteurPixels);
+                    } else {
+                        params.height = hauteurPixels;
+                    }
+                    view.setLayoutParams(params);
+
+                    textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
                 }
                 return view;
             }
@@ -107,17 +123,28 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         spinnerJ3.setAdapter(adapter);
         spinnerJ4.setAdapter(adapter);
 
-        android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
-        border.setColor(android.graphics.Color.parseColor("#22A7F0"));
-        border.setStroke(8, android.graphics.Color.WHITE);
+        // =======================================================================
+        // DESIGN DE LA BORDURE COMMUNE (Identique à ton TwoPlayers fonctionnel)
+        // =======================================================================
+        android.graphics.drawable.GradientDrawable insideBorder = new android.graphics.drawable.GradientDrawable();
+        insideBorder.setColor(android.graphics.Color.parseColor("#22A7F0"));
+        insideBorder.setStroke(8, android.graphics.Color.WHITE);
 
         int radiusPixel = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
-        border.setCornerRadius(radiusPixel);
+        insideBorder.setCornerRadius(radiusPixel);
 
-        spinnerJ1.setPopupBackgroundDrawable(border);
-        spinnerJ2.setPopupBackgroundDrawable(border);
-        spinnerJ3.setPopupBackgroundDrawable(border);
-        spinnerJ4.setPopupBackgroundDrawable(border);
+        // On encapsule dans un LayerDrawable pour forcer des marges et afficher la bordure
+        android.graphics.drawable.Drawable[] layers = {insideBorder};
+        android.graphics.drawable.LayerDrawable finalPopupBackground = new android.graphics.drawable.LayerDrawable(layers);
+
+        int paddingPopup = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
+        finalPopupBackground.setLayerInset(0, paddingPopup, paddingPopup, paddingPopup, paddingPopup);
+
+        // On applique ce fond sécurisé avec contour blanc aux 4 Spinners
+        spinnerJ1.setPopupBackgroundDrawable(finalPopupBackground);
+        spinnerJ2.setPopupBackgroundDrawable(finalPopupBackground);
+        spinnerJ3.setPopupBackgroundDrawable(finalPopupBackground);
+        spinnerJ4.setPopupBackgroundDrawable(finalPopupBackground);
 
         adapter.notifyDataSetChanged();
 
@@ -127,7 +154,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
             spinnerJ3.setSelection(2, false);
             spinnerJ4.setSelection(3, false);
         } else if (nomsJoueurs.size() >= 2) {
-            // Sécurité si tu n'as que 2 ou 3 joueurs créés pour l'instant
             spinnerJ1.setSelection(0, false);
             spinnerJ2.setSelection(1, false);
         }
@@ -147,8 +173,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         spinnerJ2.setOnItemSelectedListener(ecouteurAntiDoublon);
         spinnerJ3.setOnItemSelectedListener(ecouteurAntiDoublon);
         spinnerJ4.setOnItemSelectedListener(ecouteurAntiDoublon);
-
-
     }
 
     private void verifierDoublon(android.widget.Spinner spinnerModifie, String nomJoueur) {
@@ -157,14 +181,10 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         for (int i = 0; i < tousLesSpinners.length; i++) {
             android.widget.Spinner autreSpinner = tousLesSpinners[i];
 
-            // On ne compare pas le spinner avec lui-même
             if (autreSpinner != spinnerModifie) {
-
-                // Si le joueur sélectionné est déjà pris ailleurs
                 if (autreSpinner.getSelectedItem() != null && autreSpinner.getSelectedItem().toString().equals(nomJoueur)) {
                     android.widget.Toast.makeText(requireContext(), nomJoueur + " est déjà sélectionné !", android.widget.Toast.LENGTH_SHORT).show();
 
-                    // On cherche une position libre dans la liste pour y replacer notre spinner
                     int positionLibre = trouverPositionLibre(tousLesSpinners, spinnerModifie);
                     spinnerModifie.setSelection(positionLibre);
                     break;
@@ -173,7 +193,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
         }
     }
 
-    // Fonction bonus qui cherche automatiquement un index non utilisé par les autres
     private int trouverPositionLibre(android.widget.Spinner[] spinners, android.widget.Spinner spinnerActuel) {
         int totalItems = spinnerActuel.getCount();
         for (int pos = 0; pos < totalItems; pos++) {
@@ -184,10 +203,11 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
                     break;
                 }
             }
-            if (!positionPrise) return pos; // On a trouvé un pseudo de libre !
+            if (!positionPrise) return pos;
         }
-        return 0; // Par défaut si la base est trop petite
+        return 0;
     }
+
     public Spinner getSpinnerJ1() { return spinnerJ1; }
     public Spinner getSpinnerJ2() { return spinnerJ2; }
     public Spinner getSpinnerJ3() { return spinnerJ3; }

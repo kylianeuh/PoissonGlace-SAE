@@ -25,7 +25,7 @@
         android:layout_weight="1.6"
         android:text="Pseudo"
         android:textColor="#FFFFFF"
-        android:textSize="48sp" />
+        android:textSize="34sp" />
 
     <TextView
         android:id="@+id/tvScore"
@@ -35,5 +35,5 @@
         android:gravity="end"
         android:text="0"
         android:textColor="#FFFFFF"
-        android:textSize="48sp" />
+        android:textSize="34sp" />
 </LinearLayout>

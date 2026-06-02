@@ -5,17 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A4E2FC"
+    android:background="@drawable/frame_5"
     tools:context=".GestionJoueurActivity">
 
-    <include
-        layout="@layout/fond_complet"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/txtTitre"

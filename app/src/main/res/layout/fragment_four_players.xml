@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,8 +11,8 @@
         android:orientation="vertical"
         android:background="@drawable/bouton_arrondi_bordure"
         android:backgroundTint="#FF9800"
-        android:padding="24dp"
-        android:layout_marginBottom="32dp">
+        android:padding="20dp"
+        android:layout_marginBottom="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,8 +22,8 @@
             android:gravity="center_vertical">
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
@@ -31,7 +31,7 @@
                 android:text="J1"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="40sp" />
+                android:textSize="30sp" />
 
             <Spinner
                 android:id="@+id/spinnerJ1"
@@ -50,8 +50,8 @@
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
                 android:id="@+id/btnAddJ1"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:clickable="true"
                 android:focusable="true"
@@ -61,7 +61,7 @@
                 android:text="+"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="60sp" />
+                android:textSize="40sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -71,8 +71,8 @@
             android:gravity="center_vertical">
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
@@ -80,7 +80,7 @@
                 android:text="J2"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="40sp" />
+                android:textSize="30sp" />
 
             <Spinner
                 android:id="@+id/spinnerJ2"
@@ -99,8 +99,8 @@
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
                 android:id="@+id/btnAddJ2"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:clickable="true"
                 android:focusable="true"
@@ -110,7 +110,7 @@
                 android:text="+"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="60sp" />
+                android:textSize="40sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -120,7 +120,7 @@
         android:background="@drawable/bouton_arrondi_bordure"
         android:backgroundTint="#CC1F3A60"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -130,8 +130,8 @@
             android:orientation="horizontal">
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
@@ -139,7 +139,7 @@
                 android:text="J3"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="40sp" />
+                android:textSize="30sp" />
 
             <Spinner
                 android:id="@+id/spinnerJ3"
@@ -158,8 +158,8 @@
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
                 android:id="@+id/btnAddJ3"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:clickable="true"
                 android:focusable="true"
@@ -169,7 +169,7 @@
                 android:text="+"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="60sp" />
+                android:textSize="40sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -179,8 +179,8 @@
             android:orientation="horizontal">
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
@@ -188,7 +188,7 @@
                 android:text="J4"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="40sp" />
+                android:textSize="30sp" />
 
             <Spinner
                 android:id="@+id/spinnerJ4"
@@ -207,8 +207,8 @@
 
             <com.sae402.poissonglobe.PoissonGlaceTextView
                 android:id="@+id/btnAddJ4"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:background="@drawable/bouton_rond_bordure"
                 android:clickable="true"
                 android:focusable="true"
@@ -218,7 +218,7 @@
                 android:text="+"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
-                android:textSize="60sp" />
+                android:textSize="40sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

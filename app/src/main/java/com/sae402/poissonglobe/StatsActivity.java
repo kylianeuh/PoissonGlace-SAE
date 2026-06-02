@@ -20,7 +20,6 @@ public class StatsActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getAppDatabase(this);
         jeuDAO = db.getJeuDAO();
 
-        // Récupération initiale de la liste des joueurs
         listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
 
         chargerVueSelection();
@@ -65,29 +64,25 @@ public class StatsActivity extends AppCompatActivity {
         TextView txtGagnees = findViewById(R.id.txtPartiesGagnees);
         TextView txtPoints = findViewById(R.id.txtPointsTotal);
 
-        // Récupération de l'entité du joueur pour obtenir ses points totaux accumulés
-        JoueurBD joueurSelectionne = jeuDAO.getJoueurByNom(nomJoueur);
+        JoueurBD joueurSelectionne = jeuDAO.getJoueurParNom(nomJoueur);
 
         if (joueurSelectionne != null) {
             final int idJoueur = joueurSelectionne.id;
-            final int scoreGlobal = joueurSelectionne.scoreGlobal;
 
-            // INTELLIGENCE BDD : On exécute les calculs de stats en arrière-plan
             new Thread(() -> {
-                // Utilisation des requêtes COUNT(*) de ton JeuDAO
-                int totalJouees = jeuDAO.getNombrePartiesJouees(idJoueur);
-                int totalVictoires = jeuDAO.getNombreVictoires(idJoueur);
+                // TODO : Aller chercher les vraies valeurs en BDD à l'aide de idJoueur si besoin !
+                int nbParties = 0;
+                int nbVictoires = 0;
+                int totalPoints = joueurSelectionne.scoreGlobal;
 
-                // On renvoie les textes calculés sur le Thread de l'interface graphique
                 runOnUiThread(() -> {
-                    if (txtParties != null) txtParties.setText("Nombre de parties jouées : " + totalJouees);
-                    if (txtGagnees != null) txtGagnees.setText("Nombre de parties gagnées : " + totalVictoires);
-                    if (txtPoints != null) txtPoints.setText("Nombre de points au total : " + scoreGlobal);
+                    if (txtParties != null) txtParties.setText(getString(R.string.stat_parties_jouees, nbParties));
+                    if (txtGagnees != null) txtGagnees.setText(getString(R.string.stat_parties_gagnees, nbVictoires));
+                    if (txtPoints != null) txtPoints.setText(getString(R.string.stat_points_total, totalPoints));
                 });
             }).start();
         }
 
-        // --- GESTION ET CHARGEMENT DU CLASSEMENT GENERAL ---
         ClassementFragment fragClassement = new ClassementFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.zoneClassement, fragClassement)

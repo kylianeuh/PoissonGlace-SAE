@@ -13,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="0.6"
-        android:text="1"
+        android:text="@string/_1"
         android:textColor="#FFFFFF"
         android:textSize="48sp"
         android:textStyle="bold" />
@@ -23,7 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1.6"
-        android:text="Pseudo"
+        android:text="@string/pseudo"
         android:textColor="#FFFFFF"
         android:textSize="34sp" />
 
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
         android:gravity="end"
-        android:text="0"
+        android:text="@string/_0"
         android:textColor="#FFFFFF"
         android:textSize="34sp" />
 </LinearLayout>

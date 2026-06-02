@@ -28,7 +28,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="6dp"
-                android:text="J1"
+                android:text="@string/j1"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="30sp" />
@@ -58,7 +58,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="12dp"
-                android:text="+"
+                android:text="@string/plus"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="40sp" />
@@ -77,7 +77,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="6dp"
-                android:text="J2"
+                android:text="@string/j2"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="30sp" />
@@ -107,7 +107,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="12dp"
-                android:text="+"
+                android:text="@string/plus"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="40sp" />
@@ -136,7 +136,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="6dp"
-                android:text="J3"
+                android:text="@string/j3"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="30sp" />
@@ -166,7 +166,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="12dp"
-                android:text="+"
+                android:text="@string/plus"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="40sp" />
@@ -185,7 +185,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="6dp"
-                android:text="J4"
+                android:text="@string/j4"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="30sp" />
@@ -215,7 +215,7 @@
                 android:fontFamily="@font/cherry_bomb"
                 android:gravity="center"
                 android:paddingBottom="12dp"
-                android:text="+"
+                android:text="@string/plus"
                 android:textAlignment="center"
                 android:textColor="#FFD700"
                 android:textSize="40sp" />

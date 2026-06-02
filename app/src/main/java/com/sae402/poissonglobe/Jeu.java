@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Jeu extends AppCompatActivity {
 
-    // Mis en attribut de classe pour y accéder en toute sécurité dans onDestroy()
     private GameView terrainJeu;
 
     @Override
@@ -60,18 +59,15 @@ public class Jeu extends AppCompatActivity {
                 }
             });
 
-             terrainJeu.setOnPauseRequestedListener(new GameView.OnPauseRequestedListener() {
+            terrainJeu.setOnPauseRequestedListener(new GameView.OnPauseRequestedListener() {
                 @Override
                 public void onPauseRequested() {
                     PauseDialogFragment dialogPause = new PauseDialogFragment(terrainJeu);
-
                     dialogPause.show(getSupportFragmentManager(), "PauseDialog");
                 }
             });
         }
     }
-
-// LOCALISATION : Dans Jeu.java, remplace TOUTE ta méthode enregistrerPartieEnBdd par celle-ci :
 
     private void enregistrerPartieEnBdd(int nbJoueurs, GameView terrainJeu) {
         AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
@@ -85,9 +81,7 @@ public class Jeu extends AppCompatActivity {
 
         JoueurBD j1 = dao.getJoueurParNom(terrainJeu.nomJoueurGau);
         if (j1 != null) {
-            // Insertion du rapport de match
             dao.insertJoueurPartie(new JoueurPartieBD(j1.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
-            // Mise à jour de ses points globaux (1 but marqué = 1 point global ajouté)
             dao.ajouterPointsGlobaux(j1.id, terrainJeu.scoreJoueurGau);
         }
 

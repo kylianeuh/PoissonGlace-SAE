@@ -1,5 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">My Application</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">Poisson Glace</string>
+    <string name="titre_poisson_glace">Poisson Glace</string>
+
+    <string name="retour">Retour</string>
+    <string name="commencer">Commencer</string>
+    <string name="plus">+</string>
+
+    <string name="titre_gestion_joueurs">Gestion des Joueurs</string>
+    <string name="voir_tous_les_joueurs">Voir tous les joueurs</string>
+    <string name="s_lectionnez_le_nombre_de_joueurs">Sélectionnez le nombre\n de joueurs</string>
+    <string name="_0">0</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_4">4</string>
+
+    <string name="titre_pause">PARTIE EN PAUSE</string>
+    <string name="question_pause">Que voulez-vous faire ?</string>
+    <string name="btn_quitter">QUITTER</string>
+    <string name="btn_reprendre">REPRENDRE</string>
+
+    <string name="titre_termine">MATCH TERMINÉ !</string>
+    <string name="btn_accueil">RETOUR À L\'ACCUEIL</string>
+    <string name="format_victoire">Victoire de %1$s !</string>
+
+    <string name="titre_creer_profil">Créer un nouveau profil</string>
+    <string name="hint_pseudo">Entrez votre pseudo</string>
+    <string name="btn_annuler">ANNULER</string>
+    <string name="btn_creer">CRÉER</string>
+
+    <string name="joueur_defaut_1">Joueur 1</string>
+    <string name="joueur_defaut_2">Joueur 2</string>
+    <string name="joueur_defaut_3">Joueur 3</string>
+    <string name="joueur_defaut_4">Joueur 4</string>
+    <string name="j1">J1</string>
+    <string name="j2">J2</string>
+    <string name="j3">J3</string>
+    <string name="j4">J4</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="score">Score</string>
+
+    <string name="classement">CLASSEMENT</string>
+    <string name="rang">Rang</string>
+    <string name="statistiques">STATISTIQUES</string>
+    <string name="derni_res_parties">Dernières parties</string>
+    <string name="statistiques_globales">Statistiques globales</string>
+    <string name="s_lectionnez_le_nom_d_un_joueur_pour_voir_ses_d_tails">Sélectionnez le nom d\'un joueur pour voir ses détails</string>
+
+    <string name="stat_parties_jouees">Nombre de parties jouées : %1$d</string>
+    <string name="stat_parties_gagnees">Nombre de parties gagnées : %1$d</string>
+    <string name="stat_points_total">Nombre de points au total : %1$d</string>
+
+    <string name="regles_du_jeu">Règles du jeu</string>
+    <string name="regles">Glissez votre doigt, visez juste et poussez le poisson globe sur la terre ferme pour l\'emporter.\n\n Mode Solo : 1 contre 1 Mode Équipe : 2 contre 2\n\nChaque joueur (ou équipe) contrôle une bulle directement sur l\'écran à l\'aide de son doigt.\n\nUtilisez votre bulle pour percuter, contrer et propulser le poisson globe (le palet).\n\nLe but est d\'envoyer le poisson globe dans le camp adverse, précisément derrière la ligne de terre marron (les buts).\n\nChaque manche se joue avec un total de 10 poissons globes maximum. \n\nChaque fois qu\'un poisson globe traverse la ligne de terre marron adverse, vous marquez 1 point. \n\nLe premier joueur ou la première équipe à atteindre 5 points gagne la manche.</string>
 </resources>

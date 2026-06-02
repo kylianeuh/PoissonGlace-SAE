@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ice Fish</string>
+    <string name="titre_poisson_glace">Ice Fish</string>
+
+    <string name="retour">Back</string>
+    <string name="commencer">Start</string>
+    <string name="plus">+</string>
+
+    <string name="titre_gestion_joueurs">Player Management</string>
+    <string name="voir_tous_les_joueurs">View all players</string>
+    <string name="s_lectionnez_le_nombre_de_joueurs">Select the number\n of players</string>
+    <string name="_0">0</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_4">4</string>
+
+    <string name="titre_pause">GAME PAUSED</string>
+    <string name="question_pause">What do you want to do?</string>
+    <string name="btn_quitter">QUIT</string>
+    <string name="btn_reprendre">RESUME</string>
+
+    <string name="titre_termine">MATCH OVER !</string>
+    <string name="btn_accueil">BACK TO MAIN MENU</string>
+    <string name="format_victoire">%1$s Wins!</string>
+
+    <string name="titre_creer_profil">Create a new profile</string>
+    <string name="hint_pseudo">Enter your nickname</string>
+    <string name="btn_annuler">CANCEL</string>
+    <string name="btn_creer">CREATE</string>
+
+    <string name="joueur_defaut_1">Player 1</string>
+    <string name="joueur_defaut_2">Player 2</string>
+    <string name="joueur_defaut_3">Player 3</string>
+    <string name="joueur_defaut_4">Player 4</string>
+    <string name="j1">P1</string>
+    <string name="j2">P2</string>
+    <string name="j3">P3</string>
+    <string name="j4">P4</string>
+    <string name="pseudo">Nickname</string>
+    <string name="score">Score</string>
+
+    <string name="classement">LEADERBOARD</string>
+    <string name="rang">Rank</string>
+    <string name="statistiques">STATISTICS</string>
+    <string name="derni_res_parties">Recent matches</string>
+    <string name="statistiques_globales">Global statistics</string>
+    <string name="s_lectionnez_le_nom_d_un_joueur_pour_voir_ses_d_tails">Select a player\'s name to view their details</string>
+
+    <string name="stat_parties_jouees">Total games played: %1$d</string>
+    <string name="stat_parties_gagnees">Total games won: %1$d</string>
+    <string name="stat_points_total">Total points scored: %1$d</string>
+
+    <string name="regles_du_jeu">Game Rules</string>
+    <string name="regles">Drag your finger, aim straight and push the pufferfish onto the shoreline to win.\n\n Solo Mode: 1 vs 1 Team Mode: 2 vs 2\n\nEach player (or team) controls a bubble directly on the screen using their finger.\n\nUse your bubble to hit, block and propel the pufferfish (the puck).\n\nThe goal is to send the pufferfish into the opponent\'s camp, precisely behind the brown sand line (the goals).\n\nEach match is played with a maximum of 10 pufferfish.\n\nEach time a pufferfish crosses the opponent\'s brown sand line, you score 1 point.\n\nThe first player or team to reach 5 points wins the match.</string>
+</resources>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="850dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="40dp"
+    android:background="#70BEE9"
+    android:gravity="center_horizontal">
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:id="@+id/text_titre_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/cherry_bomb"
+        android:text="PARTIE EN PAUSE"
+        android:textColor="#FFFFFF"
+        android:textSize="65sp" />
+
+    <com.sae402.poissonglobe.PoissonGlaceTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/cherry_bomb"
+        android:text="Que voulez-vous faire ?"
+        android:textColor="#FFFFFF"
+        android:textSize="40sp"
+        android:layout_marginBottom="25dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#FFFFFF"
+        android:layout_marginBottom="30dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <com.sae402.poissonglobe.PoissonGlaceTextView
+            android:id="@+id/btn_dialog_quitter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/cherry_bomb"
+            android:padding="15dp"
+            android:text="QUITTER"
+            android:textColor="#BBFFFFFF"
+            android:textSize="45sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <com.sae402.poissonglobe.PoissonGlaceTextView
+            android:id="@+id/btn_dialog_reprendre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/cherry_bomb"
+            android:padding="15dp"
+            android:text="REPRENDRE"
+            android:textColor="#FFFFFF"
+            android:textSize="45sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

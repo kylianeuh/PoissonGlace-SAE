@@ -56,7 +56,7 @@ public class GameView extends View {
     public int scoreJoueurDro = 0;
 
     private android.media.SoundPool soundPool;
-    private final int[] sonBulles = new int[5]; // Remis à 5 pour correspondre aux 5 fichiers initialisés
+    private final int[] sonBulles = new int[5];
     private final int[] sonBords = new int[5];
     private int sonBut;
     private boolean sonsChargés = false;
@@ -95,11 +95,15 @@ public class GameView extends View {
 
     private boolean partieTerminee = false;
 
+    // NOUVEAU : Variable d'état de pause
+    private boolean jeuEnPause = false;
+
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialiserTerrain(context);
     }
 
+    // NOUVEAU : Interfaces d'écoute pour la gestion de la fin de partie et de la pause
     public interface OnGameOverListener {
         void onGameOver(String pseudoVainqueur);
     }
@@ -107,6 +111,15 @@ public class GameView extends View {
 
     public void setOnGameOverListener(OnGameOverListener listener) {
         this.gameOverListener = listener;
+    }
+
+    public interface OnPauseRequestedListener {
+        void onPauseRequested();
+    }
+    private OnPauseRequestedListener pauseRequestedListener;
+
+    public void setOnPauseRequestedListener(OnPauseRequestedListener listener) {
+        this.pauseRequestedListener = listener;
     }
 
     private void initialiserTerrain(Context context) {
@@ -187,10 +200,11 @@ public class GameView extends View {
         boucleJeu = new Runnable() {
             @Override
             public void run() {
-                if (initialisationFaite && !partieTerminee) {
+                // MODIFICATION : On ne met à jour la physique que si le jeu N'EST PAS en pause
+                if (initialisationFaite && !partieTerminee && !jeuEnPause) {
                     gererPhysiqueEtArbitrage();
                 }
-                invalidate();
+                invalidate(); // On continue de redessiner le terrain en arrière-plan
                 jeuHandler.postDelayed(this, 1000 / FPS);
             }
         };
@@ -254,7 +268,6 @@ public class GameView extends View {
         pauseBarRight.set(pauseBtnX + barSpacing / 2f, pauseBtnY - barHeight / 2f, pauseBtnX + barSpacing / 2f + barWidth, pauseBtnY + barHeight / 2f);
 
         positionYTextes = 80f;
-        // AUGMENTÉ DE 0.10f À 0.15f : Décale la base des coordonnées vers l'intérieur
         margeExtremite = w * 0.04f;
         ecartScore = 220f;
         correctionYScore = positionYTextes + 15f;
@@ -332,17 +345,14 @@ public class GameView extends View {
         String texteGauche = (nombreDeJoueursConfig == 4) ? safeJ1 + " + " + safeJ3 : safeJ1;
         String texteDroit = (nombreDeJoueursConfig == 4) ? safeJ2 + " + " + safeJ4 : safeJ2;
 
-        // ALIGNEMENT DYNAMIQUE : Le texte de gauche commence au bord et avance vers le milieu
         pinceauTexteContour.setTextAlign(Paint.Align.LEFT);
         pinceauTexteJaune.setTextAlign(Paint.Align.LEFT);
         drawTextWithContour(canvas, texteGauche, margeExtremite, positionYTextes);
 
-        // ALIGNEMENT DYNAMIQUE : Le texte de droite commence au bord droit et avance vers le milieu
         pinceauTexteContour.setTextAlign(Paint.Align.RIGHT);
         pinceauTexteJaune.setTextAlign(Paint.Align.RIGHT);
         drawTextWithContour(canvas, texteDroit, getWidth() - margeExtremite, positionYTextes);
 
-        // Les scores centraux restent calés au milieu (Align.CENTER)
         pinceauTexteContour.setTextAlign(Paint.Align.CENTER);
         pinceauTexteJaune.setTextAlign(Paint.Align.CENTER);
         drawTextWithContour(canvas, String.valueOf(scoreJoueurGau), centreX - ecartScore, correctionYScore);
@@ -356,6 +366,7 @@ public class GameView extends View {
                 if (scoreJoueurGau >= 6) {
                     vainqueur = (nombreDeJoueursConfig == 4) ? nomJoueurGau + " & " + nomJoueurGau2 : nomJoueurGau;
                 } else {
+                    navigator_vainqueur:
                     vainqueur = (nombreDeJoueursConfig == 4) ? nomJoueurDro + " & " + nomJoueurDro2 : nomJoueurDro;
                 }
 
@@ -379,6 +390,9 @@ public class GameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // NOUVEAU : Si le jeu est en pause, on bloque TOUS les mouvements tactiles immédiatement
+        if (jeuEnPause) return false;
+
         int action = event.getActionMasked();
         int indexPointeur = event.getActionIndex();
         int idPointeur = event.getPointerId(indexPointeur);
@@ -390,6 +404,8 @@ public class GameView extends View {
             float dx = touchX - pauseBtnX;
             float dy = touchY - pauseBtnY;
             if ((dx * dx + dy * dy) <= (pauseBtnRadius * pauseBtnRadius)) {
+                // MODIFICATION : Déclenchement de la pause
+                declencherPauseInterne();
                 return true;
             }
         }
@@ -440,6 +456,28 @@ public class GameView extends View {
                 break;
         }
         return true;
+    }
+
+    // NOUVEAU : Méthode interne pour verrouiller le moteur et notifier l'activité
+    private void declencherPauseInterne() {
+        this.jeuEnPause = true;
+
+        // On relâche de force tous les doigts connectés pour éviter que les bulles se téléportent à la reprise
+        idDoigtJ1 = -1; idDoigtJ2 = -1; idDoigtJ3 = -1; idDoigtJ4 = -1;
+        bulleJoueur1.reinitialiserVitesse();
+        bulleJoueur2.reinitialiserVitesse();
+        if (bulleJoueur3 != null) bulleJoueur3.reinitialiserVitesse();
+        if (bulleJoueur4 != null) bulleJoueur4.reinitialiserVitesse();
+
+        // On appelle le listener pour que l'Activité affiche le Pop-up
+        if (pauseRequestedListener != null) {
+            pauseRequestedListener.onPauseRequested();
+        }
+    }
+
+    // NOUVEAU : Méthode publique appelée par ton Pop-up pour relancer le match
+    public void reprendreJeu() {
+        this.jeuEnPause = false;
     }
 
     private void gererPhysiqueEtArbitrage() {
@@ -602,7 +640,6 @@ public class GameView extends View {
 
     private void jouerSonBulle() {
         if (sonsChargés && soundPool != null) {
-            // FIXÉ : Borne réglée sur 5 (index de 0 à 4) pour éviter de dépasser la taille du tableau
             int indexAleatoire = (int) (Math.random() * 5);
             soundPool.play(sonBulles[indexAleatoire], 1.0f, 1.0f, 1, 0, 1.0f);
         }

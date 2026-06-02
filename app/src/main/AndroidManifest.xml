@@ -24,6 +24,7 @@
         <activity android:name=".ReglesActivity" android:exported="false" />
         <activity android:name=".StatsActivity" android:exported="false" />
         <activity android:name=".Jeu" android:exported="false" />
+        <service android:name=".MusiqueService" android:enabled="true" android:exported="false" />
     </application>
 
 </manifest>

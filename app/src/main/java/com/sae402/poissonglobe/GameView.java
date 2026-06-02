@@ -63,8 +63,6 @@ public class GameView extends View {
     private android.media.SoundPool soundPool;
     private final int[] sonBulles = new int[5];
     private final int[] sonBords = new int[5];
-    private int[] sonBulles = new int[5];
-    private int[] sonBords = new int[5];
     private int sonBut;
     private boolean sonsChargés = false;
 
@@ -216,7 +214,7 @@ public class GameView extends View {
         jeuHandler.post(boucleJeu);
 
         pinceauBullesJoueurs = new Paint();
-        pinceauBullesJoueurs.setColor(Color.parseColor("#40E0D0"));
+        pinceauBullesJoueurs.setColor(Color.parseColor("#FFFFFF"));
         pinceauBullesJoueurs.setStyle(Paint.Style.STROKE);
         pinceauBullesJoueurs.setStrokeWidth(8f);
         pinceauBullesJoueurs.setAntiAlias(true);

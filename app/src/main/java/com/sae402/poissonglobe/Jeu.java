@@ -72,11 +72,13 @@ public class Jeu extends AppCompatActivity {
         }
     }
 
+// LOCALISATION : Dans Jeu.java, remplace TOUTE ta méthode enregistrerPartieEnBdd par celle-ci :
+
     private void enregistrerPartieEnBdd(int nbJoueurs, GameView terrainJeu) {
         AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
         JeuDAO dao = db.getJeuDAO();
 
-        // 1. Déterminer les status de victoire/défaite pour chaque camp
+        // 1. Déterminer les statuts de victoire/défaite pour chaque camp
         String resultatGauche = (terrainJeu.scoreJoueurGau >= 6) ? "VICTOIRE" : "DEFAITE";
         String resultatDroit = (terrainJeu.scoreJoueurDro >= 6) ? "VICTOIRE" : "DEFAITE";
 
@@ -84,31 +86,37 @@ public class Jeu extends AppCompatActivity {
         PartieBD nouvellePartie = new PartieBD(System.currentTimeMillis(), nbJoueurs);
         int partieId = (int) dao.insertPartie(nouvellePartie);
 
-        // 3. Liaison de l'équipe Gauche (Joueur 1 obligatoire)
+        // 3. Traitement de l'équipe Gauche (Joueur 1 obligatoire)
         JoueurBD j1 = dao.getJoueurParNom(terrainJeu.nomJoueurGau);
         if (j1 != null) {
+            // Insertion du rapport de match
             dao.insertJoueurPartie(new JoueurPartieBD(j1.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
+            // Mise à jour de ses points globaux (1 but marqué = 1 point global ajouté)
+            dao.ajouterPointsGlobaux(j1.id, terrainJeu.scoreJoueurGau);
         }
 
-        // Si mode 2v2 : Liaison du Joueur 3 (Coéquipier gauche)
+        // Si mode 2v2 : Traitement du Joueur 3 (Coéquipier gauche)
         if (nbJoueurs == 4) {
             JoueurBD j3 = dao.getJoueurParNom(terrainJeu.nomJoueurGau2);
             if (j3 != null) {
                 dao.insertJoueurPartie(new JoueurPartieBD(j3.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
+                dao.ajouterPointsGlobaux(j3.id, terrainJeu.scoreJoueurGau);
             }
         }
 
-        // 4. Liaison de l'équipe Droite (Joueur 2 obligatoire)
+        // 4. Traitement de l'équipe Droite (Joueur 2 obligatoire)
         JoueurBD j2 = dao.getJoueurParNom(terrainJeu.nomJoueurDro);
         if (j2 != null) {
             dao.insertJoueurPartie(new JoueurPartieBD(j2.id, partieId, terrainJeu.scoreJoueurDro, resultatDroit));
+            dao.ajouterPointsGlobaux(j2.id, terrainJeu.scoreJoueurDro);
         }
 
-        // Si mode 2v2 : Liaison du Joueur 4 (Coéquipier droit)
+        // Si mode 2v2 : Traitement du Joueur 4 (Coéquipier droit)
         if (nbJoueurs == 4) {
             JoueurBD j4 = dao.getJoueurParNom(terrainJeu.nomJoueurDro2);
             if (j4 != null) {
                 dao.insertJoueurPartie(new JoueurPartieBD(j4.id, partieId, terrainJeu.scoreJoueurDro, resultatDroit));
+                dao.ajouterPointsGlobaux(j4.id, terrainJeu.scoreJoueurDro);
             }
         }
     }

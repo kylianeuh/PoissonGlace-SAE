@@ -7,7 +7,10 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-public class GestionJoueurActivity extends AppCompatActivity{
+public class GestionJoueurActivity extends AppCompatActivity {
+
+    // 1. ON DECLARE LA VARIABLE ICI TOUT EN HAUT
+    private Fragment fragmentChoisi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,8 +18,8 @@ public class GestionJoueurActivity extends AppCompatActivity{
         setContentView(R.layout.activity_gestion_joueur);
 
         int nbJoueurs = getIntent().getIntExtra("NB_JOUEURS", 2);
-        Fragment fragmentChoisi;
 
+        // 2. ICI ON ENLEVE le mot "Fragment" devant, on fait juste l'assignation
         if (nbJoueurs == 4) {
             fragmentChoisi = new fourPlayers();
         } else {
@@ -37,20 +40,17 @@ public class GestionJoueurActivity extends AppCompatActivity{
                     Intent intent = new Intent(GestionJoueurActivity.this, Jeu.class);
                     intent.putExtra("NB_JOUEURS", nbJoueurs);
 
-                    if (nbJoueurs == 4) {
-                        fourPlayers frag = (fourPlayers) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                        if (frag != null) {
-                            intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");
-                            intent.putExtra("J2_NOM", frag.getSpinnerJ2().getSelectedItem() != null ? frag.getSpinnerJ2().getSelectedItem().toString() : "Joueur 2");
-                            intent.putExtra("J3_NOM", frag.getSpinnerJ3().getSelectedItem() != null ? frag.getSpinnerJ3().getSelectedItem().toString() : "Joueur 3");
-                            intent.putExtra("J4_NOM", frag.getSpinnerJ4().getSelectedItem() != null ? frag.getSpinnerJ4().getSelectedItem().toString() : "Joueur 4");
-                        }
-                    } else {
-                        twoPlayers frag = (twoPlayers) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                        if (frag != null) {
-                            intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");
-                            intent.putExtra("J2_NOM", frag.getSpinnerJ2().getSelectedItem() != null ? frag.getSpinnerJ2().getSelectedItem().toString() : "Joueur 2");
-                        }
+                    // Maintenant, Java accepte à 100% d'utiliser fragmentChoisi ici !
+                    if (nbJoueurs == 4 && fragmentChoisi instanceof fourPlayers) {
+                        fourPlayers frag = (fourPlayers) fragmentChoisi;
+                        intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");
+                        intent.putExtra("J2_NOM", frag.getSpinnerJ2().getSelectedItem() != null ? frag.getSpinnerJ2().getSelectedItem().toString() : "Joueur 2");
+                        intent.putExtra("J3_NOM", frag.getSpinnerJ3().getSelectedItem() != null ? frag.getSpinnerJ3().getSelectedItem().toString() : "Joueur 3");
+                        intent.putExtra("J4_NOM", frag.getSpinnerJ4().getSelectedItem() != null ? frag.getSpinnerJ4().getSelectedItem().toString() : "Joueur 4");
+                    } else if (nbJoueurs == 2 && fragmentChoisi instanceof twoPlayers) {
+                        twoPlayers frag = (twoPlayers) fragmentChoisi;
+                        intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");
+                        intent.putExtra("J2_NOM", frag.getSpinnerJ2().getSelectedItem() != null ? frag.getSpinnerJ2().getSelectedItem().toString() : "Joueur 2");
                     }
                     startActivity(intent);
                 }

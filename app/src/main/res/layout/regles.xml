@@ -18,7 +18,7 @@
         android:paddingHorizontal="20dp"
         android:text="Règles du jeu"
         android:textColor="#FFD700"
-        android:textSize="50sp"
+        android:textSize="60sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="80dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="70dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/bouton_arrondi_bordure"
         android:padding="20dp"
@@ -37,28 +37,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titreRegles"
+        app:layout_constraintTop_toBottomOf="@+id/titreRegles"
         app:layout_constraintVertical_bias="0.142">
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:id="@+id/txtContenuRegles"
             android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_height="match_parent"
             android:fontFamily="@font/cherry_bomb"
             android:gravity="center_vertical"
+            android:padding="24dp"
             android:paddingHorizontal="5dp"
             android:text="Glissez votre doigt, visez juste et poussez le poisson globe sur la terre ferme pour l'emporter.\n\n Mode Solo : 1 contre 1             Mode Équipe : 2 contre 2\n\nChaque joueur (ou équipe) contrôle une bulle directement sur l'écran à l'aide de son doigt.\n\nUtilisez votre bulle pour percuter, contrer et propulser le poisson globe (le palet).\n\nLe but est d'envoyer le poisson globe dans le camp adverse, précisément derrière la ligne de terre marron (les buts).\n\nChaque manche se joue avec un total de 10 poissons globes maximum. \n\nChaque fois qu'un poisson globe traverse la ligne de terre marron adverse, vous marquez 1 point. \n\nLe premier joueur ou la première équipe à atteindre 5 points gagne la manche."
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="34sp" />
 
     </FrameLayout>
 
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/btnRetourDetails"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="200dp"
+        android:layout_height="120dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/bouton_arrondi_bordure"
         android:clickable="true"
         android:focusable="true"
@@ -66,7 +67,7 @@
         android:gravity="center"
         android:text="Retour"
         android:textColor="#FFD700"
-        android:textSize="22sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

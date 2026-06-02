@@ -23,18 +23,25 @@ public interface JeuDAO {
 
     // --- PARTIES ---
 
-    @Insert
+    @androidx.room.Query("SELECT * FROM JoueurBD WHERE nom = :nomJoueur LIMIT 1")
+    JoueurBD getJoueurParNom(String nomJoueur);
+
+    @androidx.room.Insert
     long insertPartie(PartieBD partie);
+
+    @androidx.room.Insert
+    void insertJoueurPartie(JoueurPartieBD joueurPartie);
 
 
     // --- JOUEUR_PARTIE (Lien & Scores) ---
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertJoueurPartie(JoueurPartieBD joueurPartie);
 
     @Query("SELECT * FROM JoueurPartieBD WHERE joueur_id = :jId")
     List<JoueurPartieBD> getScoresByJoueur(int jId);
 
     @Query("SELECT * FROM JoueurPartieBD ORDER BY score DESC LIMIT 10")
     List<JoueurPartieBD> getTopScores();
+
+
+
 }

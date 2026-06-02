@@ -121,6 +121,17 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
 
         adapter.notifyDataSetChanged();
 
+        if (nomsJoueurs.size() >= 4) {
+            spinnerJ1.setSelection(0, false);
+            spinnerJ2.setSelection(1, false);
+            spinnerJ3.setSelection(2, false);
+            spinnerJ4.setSelection(3, false);
+        } else if (nomsJoueurs.size() >= 2) {
+            // Sécurité si tu n'as que 2 ou 3 joueurs créés pour l'instant
+            spinnerJ1.setSelection(0, false);
+            spinnerJ2.setSelection(1, false);
+        }
+
         android.widget.AdapterView.OnItemSelectedListener ecouteurAntiDoublon = new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
@@ -132,7 +143,6 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         };
 
-// On applique cet écouteur unique sur tes 4 spinners
         spinnerJ1.setOnItemSelectedListener(ecouteurAntiDoublon);
         spinnerJ2.setOnItemSelectedListener(ecouteurAntiDoublon);
         spinnerJ3.setOnItemSelectedListener(ecouteurAntiDoublon);

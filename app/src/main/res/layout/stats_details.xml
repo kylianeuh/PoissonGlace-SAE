@@ -10,10 +10,10 @@
 
     <com.sae402.poissonglobe.PoissonGlaceTextView
         android:id="@+id/btnRetourDetails"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="200dp"
+        android:layout_height="120dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/bouton_arrondi_bordure"
         android:clickable="true"
         android:focusable="true"
@@ -21,7 +21,7 @@
         android:gravity="center"
         android:text="Retour"
         android:textColor="#FFD700"
-        android:textSize="22sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,33 +30,32 @@
         android:id="@+id/txtNomJoueur"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="40dp"
         android:fontFamily="@font/cherry_bomb"
+        android:paddingHorizontal="20dp"
         android:text="STATISTIQUES"
         android:textColor="#FFD700"
-        android:textSize="44sp"
+        android:textSize="60sp"
         android:textStyle="bold"
-        android:paddingHorizontal="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/colonneGauche"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
         android:background="@drawable/bouton_arrondi_bordure"
         android:orientation="vertical"
         android:padding="16dp"
-        app:layout_constraintHorizontal_weight="30"
-        app:layout_constraintTop_toBottomOf="@id/txtNomJoueur"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/colonneCentre"
+        app:layout_constraintHorizontal_weight="30"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/colonneCentre">
+        app:layout_constraintTop_toBottomOf="@+id/txtNomJoueur">
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:layout_width="wrap_content"
@@ -66,7 +65,7 @@
             android:fontFamily="@font/cherry_bomb"
             android:text="Dernières parties"
             android:textColor="#FFFFFF"
-            android:textSize="22sp" />
+            android:textSize="55sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvDernieresParties"
@@ -81,18 +80,18 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bouton_arrondi_bordure"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:padding="24dp"
-        app:layout_constraintHorizontal_weight="40"
-        app:layout_constraintTop_toBottomOf="@id/txtNomJoueur"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/zoneClassement"
+        app:layout_constraintHorizontal_weight="40"
         app:layout_constraintStart_toEndOf="@id/colonneGauche"
-        app:layout_constraintEnd_toStartOf="@id/zoneClassement">
+        app:layout_constraintTop_toBottomOf="@+id/txtNomJoueur">
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:layout_width="wrap_content"
@@ -102,7 +101,7 @@
             android:fontFamily="@font/cherry_bomb"
             android:text="Statistiques globales"
             android:textColor="#FFFFFF"
-            android:textSize="22sp" />
+            android:textSize="55sp" />
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:id="@+id/txtPartiesJouees"
@@ -112,7 +111,7 @@
             android:fontFamily="@font/cherry_bomb"
             android:text="Nombre de parties jouées : 0"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="34sp" />
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:id="@+id/txtPartiesGagnees"
@@ -122,7 +121,7 @@
             android:fontFamily="@font/cherry_bomb"
             android:text="Nombre de parties gagnées : 0"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="34sp" />
 
         <com.sae402.poissonglobe.PoissonGlaceTextView
             android:id="@+id/txtPointsTotal"
@@ -131,7 +130,7 @@
             android:fontFamily="@font/cherry_bomb"
             android:text="Nombre de points au total : 0"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="34sp" />
     </LinearLayout>
 
     <FrameLayout
@@ -139,16 +138,16 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bouton_arrondi_bordure"
 
-        app:layout_constraintHorizontal_weight="30"
-
-        app:layout_constraintTop_toBottomOf="@id/txtNomJoueur"
         app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="30"
         app:layout_constraintStart_toEndOf="@id/colonneCentre"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/txtNomJoueur" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

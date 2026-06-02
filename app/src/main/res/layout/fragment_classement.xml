@@ -14,11 +14,11 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="24dp"
         android:fontFamily="@font/cherry_bomb"
+        android:paddingHorizontal="10dp"
         android:text="CLASSEMENT"
         android:textColor="#FFD700"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:paddingHorizontal="10dp" />
+        android:textSize="55sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,9 +27,34 @@
         android:weightSum="3"
         android:layout_marginBottom="12dp"
         android:paddingHorizontal="8dp">
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.6" android:text="Rang" android:textColor="#A0E0FF" android:textStyle="bold" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.6" android:text="Joueur" android:textColor="#A0E0FF" android:textStyle="bold" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.8" android:gravity="end" android:text="Score" android:textColor="#A0E0FF" android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:text="Rang"
+            android:textColor="#A0E0FF"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.6"
+            android:text="Joueur"
+            android:textColor="#A0E0FF"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:gravity="end"
+            android:text="Score"
+            android:textColor="#A0E0FF"
+            android:textSize="34sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

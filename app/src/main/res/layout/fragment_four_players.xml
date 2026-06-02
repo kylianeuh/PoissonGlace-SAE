@@ -5,200 +5,220 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- LIGNE J1 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:backgroundTint="#FF9800"
+        android:padding="24dp"
+        android:layout_marginBottom="32dp">
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:fontFamily="@font/cherry_bomb"
-            android:gravity="center"
-            android:text="J1"
-            android:paddingBottom="4dp"
-            android:textAlignment="center"
-            android:textColor="#FFD700"
-            android:textSize="22sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical">
 
-        <Spinner
-            android:id="@+id/spinnerJ1"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/bouton_arrondi_bordure"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:dropDownWidth="match_parent"
-            android:dropDownVerticalOffset="44dp"
-            android:dropDownSelector="@android:color/transparent"
-            android:popupBackground="#22A7F0" />
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="6dp"
+                android:text="J1"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="40sp" />
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:id="@+id/btnAddJ1"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cherry_bomb"
-            android:text="+"
-            android:paddingTop="4dp"
-            android:textAlignment="center"
-            android:textColor="#FFD700"
-            android:textSize="30sp" />
+            <Spinner
+                android:id="@+id/spinnerJ1"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_arrondi_bordure"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="70dp"
+                android:dropDownSelector="@android:color/transparent"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:popupBackground="#22A7F0"
+                android:textColor="#FFFFFF" />
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnAddJ1"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="12dp"
+                android:text="+"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="60sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="6dp"
+                android:text="J2"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="40sp" />
+
+            <Spinner
+                android:id="@+id/spinnerJ2"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_arrondi_bordure"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="70dp"
+                android:dropDownSelector="@android:color/transparent"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:popupBackground="#22A7F0"
+                android:textColor="#FFFFFF" />
+
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnAddJ2"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="12dp"
+                android:text="+"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="60sp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- LIGNE J2 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp"
-        android:gravity="center_vertical">
+        android:background="@drawable/bouton_arrondi_bordure"
+        android:backgroundTint="#CC1F3A60"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:gravity="center"
-            android:text="J2"
-            android:paddingBottom="4dp"
-            android:textSize="22sp"
-            android:fontFamily="@font/cherry_bomb"
-            android:textColor="#FFD700" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/spinnerJ2"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/bouton_arrondi_bordure"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:dropDownWidth="match_parent"
-            android:dropDownVerticalOffset="44dp"
-            android:dropDownSelector="@android:color/transparent"
-            android:popupBackground="#22A7F0" />
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="6dp"
+                android:text="J3"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="40sp" />
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:id="@+id/btnAddJ2"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cherry_bomb"
-            android:text="+"
-            android:paddingTop="4dp"
-            android:textAlignment="center"
-            android:textColor="#FFD700"
-            android:textSize="30sp" />
-    </LinearLayout>
+            <Spinner
+                android:id="@+id/spinnerJ3"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_arrondi_bordure"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="70dp"
+                android:dropDownSelector="@android:color/transparent"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:popupBackground="#22A7F0"
+                android:textColor="#FFFFFF" />
 
-    <!-- LIGNE J3 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp"
-        android:gravity="center_vertical">
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnAddJ3"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="12dp"
+                android:text="+"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="60sp" />
+        </LinearLayout>
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:fontFamily="@font/cherry_bomb"
-            android:gravity="center"
-            android:text="J3"
-            android:paddingBottom="4dp"
-            android:textAlignment="center"
-            android:textColor="#FFD700"
-            android:textSize="22sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/spinnerJ3"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/bouton_arrondi_bordure"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:dropDownWidth="match_parent"
-            android:dropDownVerticalOffset="44dp"
-            android:dropDownSelector="@android:color/transparent"
-            android:popupBackground="#22A7F0" />
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="6dp"
+                android:text="J4"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="40sp" />
 
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:id="@+id/btnAddJ3"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cherry_bomb"
-            android:text="+"
-            android:paddingTop="4dp"
-            android:textAlignment="center"
-            android:textColor="#FFD700"
-            android:textSize="30sp" />
-    </LinearLayout>
+            <Spinner
+                android:id="@+id/spinnerJ4"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_weight="1"
+                android:background="@drawable/bouton_arrondi_bordure"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="70dp"
+                android:dropDownSelector="@android:color/transparent"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:popupBackground="#22A7F0"
+                android:textColor="#FFFFFF" />
 
-    <!-- LIGNE J4 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:gravity="center"
-            android:text="J4"
-            android:paddingBottom="4dp"
-            android:textSize="22sp"
-            android:fontFamily="@font/cherry_bomb"
-            android:textColor="#FFD700" />
-
-        <Spinner
-            android:id="@+id/spinnerJ4"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/bouton_arrondi_bordure"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:dropDownWidth="match_parent"
-            android:dropDownVerticalOffset="44dp"
-            android:dropDownSelector="@android:color/transparent"
-            android:popupBackground="#22A7F0" />
-
-        <com.sae402.poissonglobe.PoissonGlaceTextView
-            android:id="@+id/btnAddJ4"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/bouton_rond_bordure"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cherry_bomb"
-            android:text="+"
-            android:paddingTop="4dp"
-            android:textAlignment="center"
-            android:textColor="#FFD700"
-            android:textSize="30sp" />
+            <com.sae402.poissonglobe.PoissonGlaceTextView
+                android:id="@+id/btnAddJ4"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bouton_rond_bordure"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/cherry_bomb"
+                android:gravity="center"
+                android:paddingBottom="12dp"
+                android:text="+"
+                android:textAlignment="center"
+                android:textColor="#FFD700"
+                android:textSize="60sp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

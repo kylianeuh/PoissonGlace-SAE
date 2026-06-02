@@ -20,9 +20,15 @@ public class StatsActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getAppDatabase(this);
         jeuDAO = db.getJeuDAO();
 
-        listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
+        // CORRECTION CRITIQUE : Chargement de la liste en tâche de fond pour éviter le crash
+        new Thread(() -> {
+            listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
 
-        chargerVueSelection();
+            // Une fois la liste chargée, on bascule sur l'interface graphique pour afficher la vue
+            runOnUiThread(() -> {
+                chargerVueSelection();
+            });
+        }).start();
     }
 
     private void chargerVueSelection() {

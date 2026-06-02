@@ -21,78 +21,95 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        // --- CONFIGURATION DES ÉCOUTEURS DE BOUTONS ---
 
         View btnRegles = findViewById(R.id.btnRegles);
-        btnRegles.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                android.content.Intent intent = new android.content.Intent(MainActivity.this, ReglesActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        View btnStats = findViewById(R.id.btnStats);
-        btnStats.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, StatsActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        View btn2Joueurs = findViewById(R.id.btnJoueurs2);
-        View btn4Joueurs = findViewById(R.id.btnJoueurs4);
-
-        btn2Joueurs.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, GestionJoueurActivity.class);
-            intent.putExtra("NB_JOUEURS", 2);
-            startActivity(intent);
-        });
-
-
-        btn4Joueurs.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, GestionJoueurActivity.class);
-            intent.putExtra("NB_JOUEURS", 4);
-            startActivity(intent);
-        });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-        return insets;
-        });
-
-        AppDatabase db = AppDatabase.getAppDatabase(this);
-        List<JoueurBD> listeJoueurs = db.getJeuDAO().getAllJoueurs();
-
-        if (listeJoueurs.isEmpty()) {
-            Log.d("MA_BASE", "La base est vide...");
-        } else {
-            for (JoueurBD j : listeJoueurs) {
-                Log.d("MA_BASE", "Joueur trouvé : " + j.nom +" (ID: " + j.id + ")");
-            }
+        if (btnRegles != null) {
+            btnRegles.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    android.content.Intent intent = new android.content.Intent(MainActivity.this, ReglesActivity.class);
+                    startActivity(intent);
+                }
+            });
         }
 
-        ClassementFragment fragmentClassement = new ClassementFragment();
+        View btnStats = findViewById(R.id.btnStats);
+        if (btnStats != null) {
+            btnStats.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, StatsActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
 
+        View btn2Joueurs = findViewById(R.id.btnJoueurs2);
+        if (btn2Joueurs != null) {
+            btn2Joueurs.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, GestionJoueurActivity.class);
+                intent.putExtra("NB_JOUEURS", 2);
+                startActivity(intent);
+            });
+        }
+
+        View btn4Joueurs = findViewById(R.id.btnJoueurs4);
+        if (btn4Joueurs != null) {
+            btn4Joueurs.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, GestionJoueurActivity.class);
+                intent.putExtra("NB_JOUEURS", 4);
+                startActivity(intent);
+            });
+        }
+
+        // --- GESTION DES BARRES SYSTÈME (EDGE TO EDGE) ---
+        View mainView = findViewById(R.id.main);
+        if (mainView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
+
+        // --- GESTION DU FRAGMENT DE CLASSEMENT (VISUEL) ---
+        ClassementFragment fragmentClassement = new ClassementFragment();
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.zoneClassement, fragmentClassement)
                     .commit();
         }
 
-        List<Joueur> joueursPourClassement = new ArrayList<>();
+        // --- CHARGEMENT ASYNCHRONE DE LA BDD ET DES SCORES ---
+        // Isole l'accès SQL pour éviter de figer l'interface et de déclencher l'erreur SurfaceSyncGroup
+        new Thread(() -> {
+            try {
+                AppDatabase db = AppDatabase.getAppDatabase(MainActivity.this);
+                List<JoueurBD> listeJoueurs = db.getJeuDAO().getAllJoueurs();
 
-        // On remplit cette liste dynamiquement avec les VRAIS joueurs récupérés plus haut de la BDD
-        if (listeJoueurs != null) {
-            for (JoueurBD jBD : listeJoueurs) {
-                joueursPourClassement.add(new Joueur(jBD.nom, jBD.scoreGlobal));
+                List<Joueur> joueursPourClassement = new ArrayList<>();
+
+                if (listeJoueurs == null || listeJoueurs.isEmpty()) {
+                    Log.d("MA_BASE", "La base est vide...");
+                } else {
+                    for (JoueurBD jBD : listeJoueurs) {
+                        joueursPourClassement.add(new Joueur(jBD.nom, jBD.scoreGlobal));
+                        Log.d("MA_BASE", "Joueur trouvé : " + jBD.nom + " (ID: " + jBD.id + ")");
+                    }
+                }
+
+                // Une fois les données récupérées, on met à jour le fragment sur le thread principal
+                runOnUiThread(() -> {
+                    fragmentClassement.majListeJoueurs(joueursPourClassement);
+                });
+
+            } catch (Exception e) {
+                Log.e("MA_BASE", "Erreur lors du chargement de la base de données", e);
             }
-        }
+        }).start();
 
-        // On envoie les vraies données au fragment de l'accueil
-        fragmentClassement.majListeJoueurs(joueursPourClassement);
-
+        // --- AMBIANCE SONORE GLOBALE ---
         Intent intentMusique = new Intent(this, MusiqueService.class);
         startService(intentMusique);
     }

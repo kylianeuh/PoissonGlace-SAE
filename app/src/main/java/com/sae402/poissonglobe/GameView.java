@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import androidx.annotation.NonNull;
@@ -120,22 +121,36 @@ public class GameView extends View {
         this.pauseRequestedListener = listener;
     }
 
+// LOCALISATION : Remplace TOUTE ta méthode initialiserTerrain par celle-ci dans GameView.java
+
     private void initialiserTerrain(Context context) {
         pinceauLignes = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
         pinceauButs = createPaint(Color.parseColor("#5C4033"), Paint.Style.FILL, 0f);
 
         Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
 
+        // 1. INITIALISATION DU SOUNDPOOL (Ce qui manquait et faisait crasher)
         android.media.AudioAttributes audioAttrs = new android.media.AudioAttributes.Builder()
                 .setUsage(android.media.AudioAttributes.USAGE_GAME)
                 .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
 
-        soundPool = new android.media.SoundPool.Builder()
+        this.soundPool = new android.media.SoundPool.Builder()
                 .setMaxStreams(10)
                 .setAudioAttributes(audioAttrs)
                 .build();
 
+        // 2. CONFIGURATION DE L'ÉCOUTEUR DE DIAGNOSTIC UNIQUE
+        this.soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> {
+            if (status == 0) {
+                sonsChargés = true;
+                Log.d("DIAGNOSTIC_SONS", "✓ Succès du chargement pour l'ID : " + sampleId);
+            } else {
+                Log.e("DIAGNOSTIC_SONS", "✕ ÉCHEC CRITIQUE de décodage pour l'ID : " + sampleId + " (Status : " + status + ")");
+            }
+        });
+
+        // 3. CHARGEMENT SÉCURISÉ DES SAMPLES AUDIO
         sonBulles[0] = soundPool.load(context, R.raw.son_bulle_1, 1);
         sonBulles[1] = soundPool.load(context, R.raw.son_bulle_2, 1);
         sonBulles[2] = soundPool.load(context, R.raw.son_bulle_3, 1);
@@ -149,8 +164,8 @@ public class GameView extends View {
         sonBords[4] = soundPool.load(context, R.raw.son_bord_5, 1);
 
         sonBut = soundPool.load(context, R.raw.but_sound_effect, 1);
-        soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> sonsChargés = true);
 
+        // --- ENSEMBLE DES PINCEAUX GRAPHIK ---
         pinceauTexteContour = new Paint();
         pinceauTexteContour.setTypeface(typoCherry);
         pinceauTexteContour.setColor(Color.WHITE);
@@ -187,6 +202,7 @@ public class GameView extends View {
         pauseBarLeft = new RectF();
         pauseBarRight = new RectF();
 
+        // MOTEUR DU JEU
         boucleJeu = new Runnable() {
             @Override
             public void run() {

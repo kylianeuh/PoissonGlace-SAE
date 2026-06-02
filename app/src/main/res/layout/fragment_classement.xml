@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
             android:text="Rang"
-            android:textColor="#A0E0FF"
+            android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.6"
             android:text="Joueur"
-            android:textColor="#A0E0FF"
+            android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
             android:layout_weight="0.8"
             android:gravity="end"
             android:text="Score"
-            android:textColor="#A0E0FF"
+            android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
     </LinearLayout>

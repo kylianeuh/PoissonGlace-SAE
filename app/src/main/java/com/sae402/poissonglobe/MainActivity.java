@@ -22,18 +22,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //POUR LES TESTS, A SUPPRIMER A LA FIN !!
-        View logoTest = findViewById(R.id.txtTitre);
-        if (logoTest != null) {
-            logoTest.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MainActivity.this, Jeu.class);
-                    startActivity(intent);
-                }
-            });
-        }
-
         View btnRegles = findViewById(R.id.btnRegles);
         btnRegles.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,11 +81,16 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
-        List<Joueur> joueursDeLaBase = new ArrayList<>();
-        joueursDeLaBase.add(new Joueur("Kylian", 150));
-        joueursDeLaBase.add(new Joueur("Lindsay", 90));
-        joueursDeLaBase.add(new Joueur("Nemo", 210));
+        List<Joueur> joueursPourClassement = new ArrayList<>();
 
-        fragmentClassement.majListeJoueurs(joueursDeLaBase);
+        // On remplit cette liste dynamiquement avec les VRAIS joueurs récupérés plus haut de la BDD
+        if (listeJoueurs != null) {
+            for (JoueurBD jBD : listeJoueurs) {
+                joueursPourClassement.add(new Joueur(jBD.nom, jBD.scoreGlobal));
+            }
+        }
+
+        // On envoie les vraies données au fragment de l'accueil
+        fragmentClassement.majListeJoueurs(joueursPourClassement);
     }
 }

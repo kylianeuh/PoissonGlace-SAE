@@ -1,4 +1,4 @@
-package com.sae402.poissonglobe;
+ package com.sae402.poissonglobe;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -41,6 +41,18 @@ public interface JeuDAO {
 
     @Query("SELECT * FROM JoueurPartieBD ORDER BY score DESC LIMIT 10")
     List<JoueurPartieBD> getTopScores();
+
+    // Met à jour les points totaux d'un joueur en lui ajoutant ses nouveaux buts
+    @Query("UPDATE JoueurBD SET scoreGlobal = scoreGlobal + :nouveauxButs WHERE id = :joueurId")
+    void ajouterPointsGlobaux(int joueurId, int nouveauxButs);
+
+    // Compte le nombre de parties jouées par un joueur
+    @Query("SELECT COUNT(*) FROM JoueurPartieBD WHERE joueur_id = :joueurId")
+    int getNombrePartiesJouees(int joueurId);
+
+    // Compte le nombre de victoires d'un joueur
+    @Query("SELECT COUNT(*) FROM JoueurPartieBD WHERE joueur_id = :joueurId AND resultat = 'VICTOIRE'")
+    int getNombreVictoires(int joueurId);
 
 
 

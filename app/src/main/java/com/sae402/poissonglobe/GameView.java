@@ -101,6 +101,8 @@ public class GameView extends View {
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialiserTerrain(context);
+
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     }
 
     public interface OnGameOverListener {
@@ -121,15 +123,12 @@ public class GameView extends View {
         this.pauseRequestedListener = listener;
     }
 
-// LOCALISATION : Remplace TOUTE ta méthode initialiserTerrain par celle-ci dans GameView.java
-
     private void initialiserTerrain(Context context) {
         pinceauLignes = createPaint(Color.WHITE, Paint.Style.STROKE, 12f);
         pinceauButs = createPaint(Color.parseColor("#5C4033"), Paint.Style.FILL, 0f);
 
         Typeface typoCherry = ResourcesCompat.getFont(context, R.font.cherry_bomb);
 
-        // 1. INITIALISATION DU SOUNDPOOL (Ce qui manquait et faisait crasher)
         android.media.AudioAttributes audioAttrs = new android.media.AudioAttributes.Builder()
                 .setUsage(android.media.AudioAttributes.USAGE_GAME)
                 .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -140,32 +139,25 @@ public class GameView extends View {
                 .setAudioAttributes(audioAttrs)
                 .build();
 
-        // 2. CONFIGURATION DE L'ÉCOUTEUR DE DIAGNOSTIC UNIQUE
-        this.soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> {
-            if (status == 0) {
-                sonsChargés = true;
-                Log.d("DIAGNOSTIC_SONS", "✓ Succès du chargement pour l'ID : " + sampleId);
-            } else {
-                Log.e("DIAGNOSTIC_SONS", "✕ ÉCHEC CRITIQUE de décodage pour l'ID : " + sampleId + " (Status : " + status + ")");
+        soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> {
+            if (status != 0) {
+                android.util.Log.e("SAE_AUDIO", "Le son ID " + sampleId + " n'a pas pu être décodé par la table tactile. Statut: " + status);
             }
+            sonsChargés = true;
         });
 
-        // 3. CHARGEMENT SÉCURISÉ DES SAMPLES AUDIO
         sonBulles[0] = soundPool.load(context, R.raw.son_bulle_1, 1);
         sonBulles[1] = soundPool.load(context, R.raw.son_bulle_2, 1);
         sonBulles[2] = soundPool.load(context, R.raw.son_bulle_3, 1);
         sonBulles[3] = soundPool.load(context, R.raw.son_bulle_4, 1);
-        sonBulles[4] = soundPool.load(context, R.raw.son_bulle_5, 1);
 
         sonBords[0] = soundPool.load(context, R.raw.son_bord_1, 1);
         sonBords[1] = soundPool.load(context, R.raw.son_bord_2, 1);
         sonBords[2] = soundPool.load(context, R.raw.son_bord_3, 1);
         sonBords[3] = soundPool.load(context, R.raw.son_bord_4, 1);
-        sonBords[4] = soundPool.load(context, R.raw.son_bord_5, 1);
 
         sonBut = soundPool.load(context, R.raw.but_sound_effect, 1);
 
-        // --- ENSEMBLE DES PINCEAUX GRAPHIK ---
         pinceauTexteContour = new Paint();
         pinceauTexteContour.setTypeface(typoCherry);
         pinceauTexteContour.setColor(Color.WHITE);

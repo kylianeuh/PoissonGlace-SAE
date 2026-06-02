@@ -31,10 +31,8 @@ public class MusiqueService extends Service {
         int indexAleatoire = (int) (Math.random() * listeMusiques.length);
         int musiqueChoisie = listeMusiques[indexAleatoire];
 
-        // CORRECTION CRITIQUE ANR : On initialise manuellement le MediaPlayer sans bloquer le thread
         mediaPlayer = new MediaPlayer();
 
-        // Configuration des attributs audio (indispensable pour les bonnes pratiques Android)
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                 .setUsage(AudioAttributes.USAGE_GAME)

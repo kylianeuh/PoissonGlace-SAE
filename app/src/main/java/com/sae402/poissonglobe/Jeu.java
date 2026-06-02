@@ -11,6 +11,11 @@ public class Jeu extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().setFlags(
+                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                0
+        );
         setContentView(R.layout.activity_jeu);
 
         terrainJeu = findViewById(R.id.calqueJeu);

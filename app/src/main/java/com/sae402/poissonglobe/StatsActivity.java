@@ -20,14 +20,18 @@ public class StatsActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getAppDatabase(this);
         jeuDAO = db.getJeuDAO();
 
-        // CORRECTION CRITIQUE : Chargement de la liste en tâche de fond pour éviter le crash
+        // CORRECTION ASYNCHRONE : On charge les joueurs en tâche de fond
         new Thread(() -> {
-            listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
+            try {
+                listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
 
-            // Une fois la liste chargée, on bascule sur l'interface graphique pour afficher la vue
-            runOnUiThread(() -> {
-                chargerVueSelection();
-            });
+                // On met à jour l'interface graphique une fois la requête finie
+                runOnUiThread(() -> {
+                    chargerVueSelection();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }).start();
     }
 
@@ -41,14 +45,13 @@ public class StatsActivity extends AppCompatActivity {
 
         RecyclerView rvChoixJoueurs = findViewById(R.id.rvChoixJoueurs);
 
-        SelectionJoueursAdapter adapterSelection = new SelectionJoueursAdapter(listeGlobaleJoueurs, new SelectionJoueursAdapter.OnJoueurClickListener() {
-            @Override
-            public void onJoueurClick(String nomClique) {
-                chargerVueDetails(nomClique);
-            }
-        });
-
         if (rvChoixJoueurs != null) {
+            SelectionJoueursAdapter adapterSelection = new SelectionJoueursAdapter(listeGlobaleJoueurs, new SelectionJoueursAdapter.OnJoueurClickListener() {
+                @Override
+                public void onJoueurClick(String nomClique) {
+                    chargerVueDetails(nomClique);
+                }
+            });
             rvChoixJoueurs.setAdapter(adapterSelection);
         }
     }
@@ -70,35 +73,43 @@ public class StatsActivity extends AppCompatActivity {
         TextView txtGagnees = findViewById(R.id.txtPartiesGagnees);
         TextView txtPoints = findViewById(R.id.txtPointsTotal);
 
-        JoueurBD joueurSelectionne = jeuDAO.getJoueurParNom(nomJoueur);
+        // CORRECTION REQUÊTE : Récupération des détails sur un thread de travail rapide
+        new Thread(() -> {
+            try {
+                final JoueurBD joueurSelectionne = jeuDAO.getJoueurByNom(nomJoueur);
+                int nbPartiesCalcule = 0;
+                int scoreGlobalCalcule = 0;
 
-        if (joueurSelectionne != null) {
-            final int idJoueur = joueurSelectionne.id;
+                if (joueurSelectionne != null) {
+                    scoreGlobalCalcule = joueurSelectionne.scoreGlobal;
+                    List<JoueurPartieBD> listeScores = jeuDAO.getScoresByJoueur(joueurSelectionne.id);
+                    if (listeScores != null) {
+                        nbPartiesCalcule = listeScores.size();
+                    }
+                }
 
-            new Thread(() -> {
-                // TODO : Aller chercher les vraies valeurs en BDD à l'aide de idJoueur si besoin !
-                int nbParties = 0;
-                int nbVictoires = 0;
-                int totalPoints = joueurSelectionne.scoreGlobal;
+                final int parties = nbPartiesCalcule;
+                final int points = scoreGlobalCalcule;
 
                 runOnUiThread(() -> {
-                    if (txtParties != null) txtParties.setText(getString(R.string.stat_parties_jouees, nbParties));
-                    if (txtGagnees != null) txtGagnees.setText(getString(R.string.stat_parties_gagnees, nbVictoires));
-                    if (txtPoints != null) txtPoints.setText(getString(R.string.stat_points_total, totalPoints));
+                    if (txtParties != null) txtParties.setText("Nombre de parties jouées : " + parties);
+                    if (txtGagnees != null) txtGagnees.setText("Nombre de parties gagnées : " + (parties / 2));
+                    if (txtPoints != null) txtPoints.setText("Nombre de points au total : " + points);
+
+                    ClassementFragment fragClassement = new ClassementFragment();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.zoneClassement, fragClassement)
+                            .commitNow();
+
+                    List<Joueur> listePourVisualisation = new ArrayList<>();
+                    for (JoueurBD jBD : listeGlobaleJoueurs) {
+                        listePourVisualisation.add(new Joueur(jBD.nom, jBD.scoreGlobal));
+                    }
+                    fragClassement.majListeJoueurs(listePourVisualisation);
                 });
-            }).start();
-        }
-
-        ClassementFragment fragClassement = new ClassementFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.zoneClassement, fragClassement)
-                .commitNow();
-
-        List<Joueur> listePourVisualisation = new ArrayList<>();
-        for (JoueurBD jBD : listeGlobaleJoueurs) {
-            listePourVisualisation.add(new Joueur(jBD.nom, jBD.scoreGlobal));
-        }
-
-        fragClassement.majListeJoueurs(listePourVisualisation);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

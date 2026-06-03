@@ -62,117 +62,120 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
     }
 
     private void refreshSpinners() {
-        AppDatabase db = AppDatabase.getAppDatabase(requireContext());
-        List<JoueurBD> joueurs = db.getJeuDAO().getAllJoueurs();
+        // CORRECTION CRITIQUE : Requête SQL sur un thread secondaire pour éviter le blocage
+        new Thread(() -> {
+            try {
+                AppDatabase db = AppDatabase.getAppDatabase(requireContext());
+                List<JoueurBD> joueurs = db.getJeuDAO().getAllJoueurs();
 
-        nomsJoueurs.clear();
-        for (JoueurBD j : joueurs){
-            nomsJoueurs.add(j.nom);
-        }
+                if (isAdded() && getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        nomsJoueurs.clear();
+                        for (JoueurBD j : joueurs){
+                            nomsJoueurs.add(j.nom);
+                        }
 
-        adapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, nomsJoueurs) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                android.widget.TextView textView = view.findViewById(android.R.id.text1);
-                if (textView != null) {
-                    textView.setTextColor(android.graphics.Color.WHITE);
-                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
-                    textView.setTextSize(30f);
+                        adapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, nomsJoueurs) {
+                            @NonNull
+                            @Override
+                            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                                View view = super.getView(position, convertView, parent);
+                                android.widget.TextView textView = view.findViewById(android.R.id.text1);
+                                if (textView != null) {
+                                    textView.setTextColor(android.graphics.Color.WHITE);
+                                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                                    textView.setTextSize(30f);
+                                }
+                                return view;
+                            }
+
+                            @Override
+                            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                                View view = super.getDropDownView(position, convertView, parent);
+                                android.widget.TextView textView = view.findViewById(android.R.id.text1);
+
+                                if (textView != null) {
+                                    view.setBackgroundColor(android.graphics.Color.parseColor("#22A7F0"));
+                                    textView.setTextColor(android.graphics.Color.WHITE);
+                                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                                    textView.setTextSize(30f);
+
+                                    int pHorizontal = (int) (24 * parent.getContext().getResources().getDisplayMetrics().density);
+                                    textView.setPadding(pHorizontal, 0, pHorizontal, 0);
+
+                                    int hauteurPixels = (int) (70 * parent.getContext().getResources().getDisplayMetrics().density);
+
+                                    ViewGroup.LayoutParams params = view.getLayoutParams();
+                                    if (params == null) {
+                                        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, hauteurPixels);
+                                    } else {
+                                        params.height = hauteurPixels;
+                                    }
+                                    view.setLayoutParams(params);
+                                    textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                                }
+                                return view;
+                            }
+                        };
+
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                        spinnerJ1.setAdapter(adapter);
+                        spinnerJ2.setAdapter(adapter);
+                        spinnerJ3.setAdapter(adapter);
+                        spinnerJ4.setAdapter(adapter);
+
+                        android.graphics.drawable.GradientDrawable insideBorder = new android.graphics.drawable.GradientDrawable();
+                        insideBorder.setColor(android.graphics.Color.parseColor("#22A7F0"));
+                        insideBorder.setStroke(8, android.graphics.Color.WHITE);
+
+                        int radiusPixel = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
+                        insideBorder.setCornerRadius(radiusPixel);
+
+                        android.graphics.drawable.Drawable[] layers = {insideBorder};
+                        android.graphics.drawable.LayerDrawable finalPopupBackground = new android.graphics.drawable.LayerDrawable(layers);
+
+                        int paddingPopup = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
+                        finalPopupBackground.setLayerInset(0, paddingPopup, paddingPopup, paddingPopup, paddingPopup);
+
+                        spinnerJ1.setPopupBackgroundDrawable(finalPopupBackground);
+                        spinnerJ2.setPopupBackgroundDrawable(finalPopupBackground);
+                        spinnerJ3.setPopupBackgroundDrawable(finalPopupBackground);
+                        spinnerJ4.setPopupBackgroundDrawable(finalPopupBackground);
+
+                        adapter.notifyDataSetChanged();
+
+                        if (nomsJoueurs.size() >= 4) {
+                            spinnerJ1.setSelection(0, false);
+                            spinnerJ2.setSelection(1, false);
+                            spinnerJ3.setSelection(2, false);
+                            spinnerJ4.setSelection(3, false);
+                        } else if (nomsJoueurs.size() >= 2) {
+                            spinnerJ1.setSelection(0, false);
+                            spinnerJ2.setSelection(1, false);
+                        }
+
+                        android.widget.AdapterView.OnItemSelectedListener ecouteurAntiDoublon = new android.widget.AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                                String joueurSelectionne = parent.getItemAtPosition(position).toString();
+                                verifierDoublon((android.widget.Spinner) parent, joueurSelectionne);
+                            }
+
+                            @Override
+                            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+                        };
+
+                        spinnerJ1.setOnItemSelectedListener(ecouteurAntiDoublon);
+                        spinnerJ2.setOnItemSelectedListener(ecouteurAntiDoublon);
+                        spinnerJ3.setOnItemSelectedListener(ecouteurAntiDoublon);
+                        spinnerJ4.setOnItemSelectedListener(ecouteurAntiDoublon);
+                    });
                 }
-                return view;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            @Override
-            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                android.widget.TextView textView = view.findViewById(android.R.id.text1);
-
-                if (textView != null) {
-                    // Les lignes individuelles restent en bleu uni sans grille blanche étrange
-                    view.setBackgroundColor(android.graphics.Color.parseColor("#22A7F0"));
-
-                    textView.setTextColor(android.graphics.Color.WHITE);
-                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
-                    textView.setTextSize(30f);
-
-                    int pHorizontal = (int) (24 * parent.getContext().getResources().getDisplayMetrics().density);
-                    textView.setPadding(pHorizontal, 0, pHorizontal, 0);
-
-                    int hauteurPixels = (int) (70 * parent.getContext().getResources().getDisplayMetrics().density);
-
-                    ViewGroup.LayoutParams params = view.getLayoutParams();
-                    if (params == null) {
-                        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, hauteurPixels);
-                    } else {
-                        params.height = hauteurPixels;
-                    }
-                    view.setLayoutParams(params);
-
-                    textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                }
-                return view;
-            }
-        };
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerJ1.setAdapter(adapter);
-        spinnerJ2.setAdapter(adapter);
-        spinnerJ3.setAdapter(adapter);
-        spinnerJ4.setAdapter(adapter);
-
-        // =======================================================================
-        // DESIGN DE LA BORDURE COMMUNE (Identique à ton TwoPlayers fonctionnel)
-        // =======================================================================
-        android.graphics.drawable.GradientDrawable insideBorder = new android.graphics.drawable.GradientDrawable();
-        insideBorder.setColor(android.graphics.Color.parseColor("#22A7F0"));
-        insideBorder.setStroke(8, android.graphics.Color.WHITE);
-
-        int radiusPixel = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
-        insideBorder.setCornerRadius(radiusPixel);
-
-        // On encapsule dans un LayerDrawable pour forcer des marges et afficher la bordure
-        android.graphics.drawable.Drawable[] layers = {insideBorder};
-        android.graphics.drawable.LayerDrawable finalPopupBackground = new android.graphics.drawable.LayerDrawable(layers);
-
-        int paddingPopup = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
-        finalPopupBackground.setLayerInset(0, paddingPopup, paddingPopup, paddingPopup, paddingPopup);
-
-        // On applique ce fond sécurisé avec contour blanc aux 4 Spinners
-        spinnerJ1.setPopupBackgroundDrawable(finalPopupBackground);
-        spinnerJ2.setPopupBackgroundDrawable(finalPopupBackground);
-        spinnerJ3.setPopupBackgroundDrawable(finalPopupBackground);
-        spinnerJ4.setPopupBackgroundDrawable(finalPopupBackground);
-
-        adapter.notifyDataSetChanged();
-
-        if (nomsJoueurs.size() >= 4) {
-            spinnerJ1.setSelection(0, false);
-            spinnerJ2.setSelection(1, false);
-            spinnerJ3.setSelection(2, false);
-            spinnerJ4.setSelection(3, false);
-        } else if (nomsJoueurs.size() >= 2) {
-            spinnerJ1.setSelection(0, false);
-            spinnerJ2.setSelection(1, false);
-        }
-
-        android.widget.AdapterView.OnItemSelectedListener ecouteurAntiDoublon = new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                String joueurSelectionne = parent.getItemAtPosition(position).toString();
-                verifierDoublon((android.widget.Spinner) parent, joueurSelectionne);
-            }
-
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        };
-
-        spinnerJ1.setOnItemSelectedListener(ecouteurAntiDoublon);
-        spinnerJ2.setOnItemSelectedListener(ecouteurAntiDoublon);
-        spinnerJ3.setOnItemSelectedListener(ecouteurAntiDoublon);
-        spinnerJ4.setOnItemSelectedListener(ecouteurAntiDoublon);
+        }).start();
     }
 
     private void verifierDoublon(android.widget.Spinner spinnerModifie, String nomJoueur) {

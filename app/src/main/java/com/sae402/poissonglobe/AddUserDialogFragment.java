@@ -26,8 +26,6 @@ public class AddUserDialogFragment extends DialogFragment {
         // CONFIGURATION CORRECTE DE LA FENÊTRE VIA LA MÉTHODE
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            // CORRECTION ICI : Utilisation de la méthode setSoftInputMode
             getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
 
@@ -51,15 +49,37 @@ public class AddUserDialogFragment extends DialogFragment {
                 if (!pseudo.isEmpty()) {
                     JoueurBD nouveauJoueur = new JoueurBD();
                     nouveauJoueur.nom = pseudo;
+                    nouveauJoueur.scoreGlobal = 0;
 
-                    AppDatabase db = AppDatabase.getAppDatabase(requireContext());
-                    db.getJeuDAO().insertJoueur(nouveauJoueur);
+                    // CORRECTION CRITIQUE : Thread de sauvegarde parfaitement écrit
+                    new Thread(() -> {
+                        try {
+                            // On utilise directement le contexte de l'application pour éviter les pertes de référence
+                            android.content.Context ctx = requireContext().getApplicationContext();
 
-                    if (getParentFragment() instanceof OnUserAddedListener) {
-                        ((OnUserAddedListener) getParentFragment()).onUserAdded();
-                    }
+                            // DOUBLE SÉCURITÉ : Vérification physique du dossier
+                            java.io.File dbDir = new java.io.File(ctx.getApplicationInfo().dataDir + "/databases");
+                            if (!dbDir.exists()) {
+                                dbDir.mkdir();
+                            }
 
-                    dismiss();
+                            // Récupération de la base et insertion
+                            AppDatabase db = AppDatabase.getAppDatabase(ctx);
+                            db.getJeuDAO().insertJoueur(nouveauJoueur);
+
+                            // Notification et fermeture sur le Thread de l'interface
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    if (getParentFragment() instanceof OnUserAddedListener) {
+                                        ((OnUserAddedListener) getParentFragment()).onUserAdded();
+                                    }
+                                    dismiss();
+                                });
+                            }
+                        } catch (Exception e) {
+                            android.util.Log.e("SAE_BDD", "Erreur d'insertion", e);
+                        }
+                    }).start();
                 }
             }
         });

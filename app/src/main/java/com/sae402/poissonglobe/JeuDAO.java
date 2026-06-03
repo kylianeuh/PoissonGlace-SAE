@@ -1,4 +1,4 @@
- package com.sae402.poissonglobe;
+package com.sae402.poissonglobe;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -11,8 +11,9 @@ public interface JeuDAO {
 
     // --- JOUEURS ---
 
+    // CORRECTION : On renvoie un long pour forcer Room à synchroniser l'écriture sur l'écran tactile
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertJoueur(JoueurBD joueur);
+    long insertJoueur(JoueurBD joueur);
 
     @Query("SELECT * FROM JoueurBD")
     List<JoueurBD> getAllJoueurs();
@@ -23,18 +24,18 @@ public interface JeuDAO {
 
     // --- PARTIES ---
 
-    @androidx.room.Query("SELECT * FROM JoueurBD WHERE nom = :nomJoueur LIMIT 1")
+    @Query("SELECT * FROM JoueurBD WHERE nom = :nomJoueur LIMIT 1")
     JoueurBD getJoueurParNom(String nomJoueur);
 
-    @androidx.room.Insert
+    @Insert
     long insertPartie(PartieBD partie);
 
-    @androidx.room.Insert
-    void insertJoueurPartie(JoueurPartieBD joueurPartie);
+    // CORRECTION : On renvoie un long pour éviter de figer la table de liaison
+    @Insert
+    long insertJoueurPartie(JoueurPartieBD joueurPartie);
 
 
     // --- JOUEUR_PARTIE (Lien & Scores) ---
-
 
     @Query("SELECT * FROM JoueurPartieBD WHERE joueur_id = :jId")
     List<JoueurPartieBD> getScoresByJoueur(int jId);
@@ -53,7 +54,4 @@ public interface JeuDAO {
     // Compte le nombre de victoires d'un joueur
     @Query("SELECT COUNT(*) FROM JoueurPartieBD WHERE joueur_id = :joueurId AND resultat = 'VICTOIRE'")
     int getNombreVictoires(int joueurId);
-
-
-
 }

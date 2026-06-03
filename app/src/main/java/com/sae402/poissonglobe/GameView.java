@@ -58,8 +58,8 @@ public class GameView extends View {
     public int scoreJoueurDro = 0;
 
     private android.media.SoundPool soundPool;
-    private final int[] sonBulles = new int[5];
-    private final int[] sonBords = new int[5];
+    private final int[] sonBulles = new int[4];
+    private final int[] sonBords = new int[4];
     private int sonBut;
     private boolean sonsChargés = false;
 
@@ -663,14 +663,14 @@ public class GameView extends View {
 
     private void jouerSonBulle() {
         if (sonsChargés && soundPool != null) {
-            int indexAleatoire = (int) (Math.random() * 5);
+            int indexAleatoire = (int) (Math.random() * 4);
             soundPool.play(sonBulles[indexAleatoire], 1.0f, 1.0f, 1, 0, 1.0f);
         }
     }
 
     private void jouerSonBord() {
         if (sonsChargés && soundPool != null) {
-            int indexAleatoire = (int) (Math.random() * 5);
+            int indexAleatoire = (int) (Math.random() * 4);
             soundPool.play(sonBords[indexAleatoire], 0.8f, 0.8f, 1, 0, 1.0f);
         }
     }

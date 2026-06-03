@@ -53,115 +53,122 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
     }
 
     private void refreshSpinners() {
-        AppDatabase db = AppDatabase.getAppDatabase(requireContext());
-        List<JoueurBD> joueurs = db.getJeuDAO().getAllJoueurs();
+        // CORRECTION CRITIQUE : On effectue la lecture BDD en tâche de fond pour le vrai téléphone
+        new Thread(() -> {
+            try {
+                AppDatabase db = AppDatabase.getAppDatabase(requireContext());
+                List<JoueurBD> joueurs = db.getJeuDAO().getAllJoueurs();
 
-        nomsJoueurs.clear();
-        for (JoueurBD j : joueurs){
-            nomsJoueurs.add(j.nom);
-        }
+                // Une fois les données lues, on retourne sur le thread principal pour modifier l'interface
+                if (isAdded() && getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        nomsJoueurs.clear();
+                        for (JoueurBD j : joueurs){
+                            nomsJoueurs.add(j.nom);
+                        }
 
-        adapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, nomsJoueurs) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                android.widget.TextView textView = view.findViewById(android.R.id.text1);
-                if (textView != null) {
-                    textView.setTextColor(android.graphics.Color.WHITE);
-                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
-                    textView.setTextSize(30f);
+                        adapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, nomsJoueurs) {
+                            @NonNull
+                            @Override
+                            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                                View view = super.getView(position, convertView, parent);
+                                android.widget.TextView textView = view.findViewById(android.R.id.text1);
+                                if (textView != null) {
+                                    textView.setTextColor(android.graphics.Color.WHITE);
+                                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                                    textView.setTextSize(30f);
+                                }
+                                return view;
+                            }
+
+                            @Override
+                            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                                View view = super.getDropDownView(position, convertView, parent);
+                                android.widget.TextView textView = view.findViewById(android.R.id.text1);
+
+                                if (textView != null) {
+                                    view.setBackgroundColor(android.graphics.Color.parseColor("#22A7F0"));
+                                    textView.setTextColor(android.graphics.Color.WHITE);
+                                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                                    textView.setTextSize(30f);
+
+                                    int pHorizontal = (int) (24 * parent.getContext().getResources().getDisplayMetrics().density);
+                                    textView.setPadding(pHorizontal, 0, pHorizontal, 0);
+
+                                    int hauteurPixels = (int) (70 * parent.getContext().getResources().getDisplayMetrics().density);
+
+                                    ViewGroup.LayoutParams params = view.getLayoutParams();
+                                    if (params == null) {
+                                        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, hauteurPixels);
+                                    } else {
+                                        params.height = hauteurPixels;
+                                    }
+                                    view.setLayoutParams(params);
+                                    textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                                }
+                                return view;
+                            }
+                        };
+
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                        spinnerJ1.setAdapter(adapter);
+                        spinnerJ2.setAdapter(adapter);
+
+                        android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
+                        border.setColor(android.graphics.Color.parseColor("#22A7F0"));
+                        border.setStroke(8, android.graphics.Color.WHITE);
+
+                        int radiusPixel = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
+                        border.setCornerRadius(radiusPixel);
+
+                        spinnerJ1.setPopupBackgroundDrawable(border);
+                        spinnerJ2.setPopupBackgroundDrawable(border);
+
+                        adapter.notifyDataSetChanged();
+
+                        if (nomsJoueurs.size() >= 2) {
+                            spinnerJ1.setSelection(0);
+                            spinnerJ2.setSelection(1);
+                        }
+
+                        spinnerJ1.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                                if (spinnerJ1.getSelectedItemPosition() == spinnerJ2.getSelectedItemPosition()) {
+                                    android.widget.Toast.makeText(requireContext(), "Ce joueur est déjà sélectionné par le Joueur 2 !", android.widget.Toast.LENGTH_SHORT).show();
+                                    if (position == 0 && parent.getCount() > 1) {
+                                        spinnerJ1.setSelection(1);
+                                    } else {
+                                        spinnerJ1.setSelection(0);
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+                        });
+
+                        spinnerJ2.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                                if (spinnerJ2.getSelectedItemPosition() == spinnerJ1.getSelectedItemPosition()) {
+                                    android.widget.Toast.makeText(requireContext(), "Ce joueur est déjà sélectionné par le Joueur 1 !", android.widget.Toast.LENGTH_SHORT).show();
+                                    if (position == 0 && parent.getCount() > 1) {
+                                        spinnerJ2.setSelection(1);
+                                    } else {
+                                        spinnerJ2.setSelection(0);
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+                        });
+                    });
                 }
-                return view;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            @Override
-            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                android.widget.TextView textView = view.findViewById(android.R.id.text1);
-
-                if (textView != null) {
-                    // SOLUTION POUR LE TEXTE VIDE : On force le fond de la ligne en bleu ciel unifié
-                    view.setBackgroundColor(android.graphics.Color.parseColor("#22A7F0"));
-
-                    textView.setTextColor(android.graphics.Color.WHITE);
-                    textView.setTypeface(null, android.graphics.Typeface.BOLD);
-                    textView.setTextSize(30f);
-
-                    int pHorizontal = (int) (24 * parent.getContext().getResources().getDisplayMetrics().density);
-                    textView.setPadding(pHorizontal, 0, pHorizontal, 0);
-
-                    // Hauteur à 70dp pour que ce soit compact et ne déborde pas
-                    int hauteurPixels = (int) (70 * parent.getContext().getResources().getDisplayMetrics().density);
-
-                    ViewGroup.LayoutParams params = view.getLayoutParams();
-                    if (params == null) {
-                        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, hauteurPixels);
-                    } else {
-                        params.height = hauteurPixels;
-                    }
-                    view.setLayoutParams(params);
-
-                    textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                }
-                return view;
-            }
-        };
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerJ1.setAdapter(adapter);
-        spinnerJ2.setAdapter(adapter);
-
-        // TA VERSION D'AVANT POUR LES BORDURES BLANCHES (RESTAURÉE)
-        android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
-        border.setColor(android.graphics.Color.parseColor("#22A7F0"));
-        border.setStroke(8, android.graphics.Color.WHITE);
-
-        int radiusPixel = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
-        border.setCornerRadius(radiusPixel);
-
-        spinnerJ1.setPopupBackgroundDrawable(border);
-        spinnerJ2.setPopupBackgroundDrawable(border);
-
-        adapter.notifyDataSetChanged();
-
-        if (nomsJoueurs.size() >= 2) {
-            spinnerJ1.setSelection(0);
-            spinnerJ2.setSelection(1);
-        }
-
-        spinnerJ1.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                if (spinnerJ1.getSelectedItemPosition() == spinnerJ2.getSelectedItemPosition()) {
-                    android.widget.Toast.makeText(requireContext(), "Ce joueur est déjà sélectionné par le Joueur 2 !", android.widget.Toast.LENGTH_SHORT).show();
-                    if (position == 0 && parent.getCount() > 1) {
-                        spinnerJ1.setSelection(1);
-                    } else {
-                        spinnerJ1.setSelection(0);
-                    }
-                }
-            }
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        });
-
-        spinnerJ2.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                if (spinnerJ2.getSelectedItemPosition() == spinnerJ1.getSelectedItemPosition()) {
-                    android.widget.Toast.makeText(requireContext(), "Ce joueur est déjà sélectionné par le Joueur 1 !", android.widget.Toast.LENGTH_SHORT).show();
-                    if (position == 0 && parent.getCount() > 1) {
-                        spinnerJ2.setSelection(1);
-                    } else {
-                        spinnerJ2.setSelection(0);
-                    }
-                }
-            }
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        });
+        }).start();
     }
     public Spinner getSpinnerJ1() { return spinnerJ1; }
     public Spinner getSpinnerJ2() { return spinnerJ2; }

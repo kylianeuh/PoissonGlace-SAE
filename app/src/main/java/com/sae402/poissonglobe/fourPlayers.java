@@ -1,6 +1,7 @@
 package com.sae402.poissonglobe;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,8 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
 
         View.OnClickListener openDialogListener = v -> {
             AddUserDialogFragment dialog = new AddUserDialogFragment();
+            // CORRECTION INTERFACE : Dit au pop-up que c'est CE fragment qui doit recevoir l'événement
+            dialog.setTargetFragment(this, 0);
             dialog.show(getChildFragmentManager(), "AddUser");
         };
 
@@ -62,13 +65,14 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
     }
 
     private void refreshSpinners() {
-        // CORRECTION CRITIQUE : Requête SQL sur un thread secondaire pour éviter le blocage
         new Thread(() -> {
             try {
-                AppDatabase db = AppDatabase.getAppDatabase(requireContext());
+                if (!isAdded() || getContext() == null) return;
+
+                AppDatabase db = AppDatabase.getAppDatabase(getContext());
                 List<JoueurBD> joueurs = db.getJeuDAO().getAllJoueurs();
 
-                if (isAdded() && getActivity() != null) {
+                if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         nomsJoueurs.clear();
                         for (JoueurBD j : joueurs){
@@ -173,7 +177,7 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
                     });
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.e("SAE_ERR_BDD", "Le thread BDD du Fragment à 4 joueurs a échoué", e);
             }
         }).start();
     }
@@ -215,4 +219,10 @@ public class fourPlayers extends Fragment implements AddUserDialogFragment.OnUse
     public Spinner getSpinnerJ2() { return spinnerJ2; }
     public Spinner getSpinnerJ3() { return spinnerJ3; }
     public Spinner getSpinnerJ4() { return spinnerJ4; }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshSpinners();
+    }
 }

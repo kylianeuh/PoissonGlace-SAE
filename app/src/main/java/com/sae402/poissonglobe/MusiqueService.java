@@ -39,7 +39,6 @@ public class MusiqueService extends Service {
                 .build());
 
         try {
-            // Liaison sécurisée avec le fichier brut du dossier res/raw
             android.content.res.AssetFileDescriptor afd = getResources().openRawResourceFd(musiqueChoisie);
             if (afd != null) {
                 mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -48,7 +47,6 @@ public class MusiqueService extends Service {
                 mediaPlayer.setLooping(true);
                 mediaPlayer.setVolume(0.7f, 0.7f);
 
-                // Écouteur : se déclenche dès que le décodage asynchrone en tâche de fond est fini
                 mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
@@ -58,7 +56,6 @@ public class MusiqueService extends Service {
                     }
                 });
 
-                // On lance la préparation en tâche de fond (Asynchrone = ZÉRO FREEZE)
                 mediaPlayer.prepareAsync();
             }
         } catch (Exception e) {
@@ -68,7 +65,6 @@ public class MusiqueService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // La lecture est maintenant gérée par le OnPreparedListener
         return START_NOT_STICKY;
     }
 

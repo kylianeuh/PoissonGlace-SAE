@@ -3,15 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        tools:replace="android:allowBackup,android:fullBackupContent"
         android:icon="@drawable/fish_brown"
         android:label="Poisson Glace V1"
         android:roundIcon="@drawable/fish_brown"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -20,10 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".GestionJoueurActivity" />
         <activity android:name=".ReglesActivity" android:exported="false" />
         <activity android:name=".StatsActivity" android:exported="false" />
         <activity android:name=".Jeu" android:exported="false" />
+
         <service android:name=".MusiqueService" android:enabled="true" android:exported="false" />
     </application>
 

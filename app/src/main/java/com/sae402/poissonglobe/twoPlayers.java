@@ -1,5 +1,6 @@
 package com.sae402.poissonglobe;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
 
         View.OnClickListener openDialogListener = v -> {
             AddUserDialogFragment dialog = new AddUserDialogFragment();
+            dialog.setTargetFragment(this, 0);
             dialog.show(getChildFragmentManager(), "AddUser");
         };
 
@@ -53,14 +55,14 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
     }
 
     private void refreshSpinners() {
-        // CORRECTION CRITIQUE : On effectue la lecture BDD en tâche de fond pour le vrai téléphone
         new Thread(() -> {
             try {
-                AppDatabase db = AppDatabase.getAppDatabase(requireContext());
+                if (!isAdded() || getContext() == null) return;
+
+                AppDatabase db = AppDatabase.getAppDatabase(getContext());
                 List<JoueurBD> joueurs = db.getJeuDAO().getAllJoueurs();
 
-                // Une fois les données lues, on retourne sur le thread principal pour modifier l'interface
-                if (isAdded() && getActivity() != null) {
+                if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         nomsJoueurs.clear();
                         for (JoueurBD j : joueurs){
@@ -166,10 +168,17 @@ public class twoPlayers extends Fragment implements AddUserDialogFragment.OnUser
                     });
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.e("SAE_ERR_BDD", "Le thread BDD du Fragment a échoué", e);
             }
         }).start();
     }
+
     public Spinner getSpinnerJ1() { return spinnerJ1; }
     public Spinner getSpinnerJ2() { return spinnerJ2; }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshSpinners();
+    }
 }

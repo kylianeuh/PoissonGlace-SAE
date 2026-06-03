@@ -28,11 +28,9 @@ public class ClassementFragment extends Fragment {
         rvClassement = view.findViewById(R.id.rvClassement);
         rvClassement.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Initialisation de l'adaptateur avec la liste (triée ou non)
         adapter = new ClassementAdapter(listeJoueurs);
         rvClassement.setAdapter(adapter);
 
-        // CORRECTION : Si des données ont été injectées avant la création de la vue, on force l'affichage
         if (!listeJoueurs.isEmpty()) {
             adapter.notifyDataSetChanged();
         }
@@ -45,7 +43,6 @@ public class ClassementFragment extends Fragment {
             this.listeJoueurs.clear();
             this.listeJoueurs.addAll(nouveauxJoueurs);
 
-            // Tri décroissant parfait
             Collections.sort(this.listeJoueurs, new Comparator<Joueur>() {
                 @Override
                 public int compare(Joueur j1, Joueur j2) {
@@ -53,7 +50,6 @@ public class ClassementFragment extends Fragment {
                 }
             });
 
-            // Si la vue est déjà prête, on rafraîchit le RecyclerView
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }

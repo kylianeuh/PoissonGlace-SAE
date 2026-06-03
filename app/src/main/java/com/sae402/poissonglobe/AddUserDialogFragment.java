@@ -23,7 +23,6 @@ public class AddUserDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_add_user, container, false);
 
-        // CONFIGURATION CORRECTE DE LA FENÊTRE VIA LA MÉTHODE
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -51,26 +50,23 @@ public class AddUserDialogFragment extends DialogFragment {
                     nouveauJoueur.nom = pseudo;
                     nouveauJoueur.scoreGlobal = 0;
 
-                    // CORRECTION CRITIQUE : Thread de sauvegarde parfaitement écrit
                     new Thread(() -> {
                         try {
-                            // On utilise directement le contexte de l'application pour éviter les pertes de référence
                             android.content.Context ctx = requireContext().getApplicationContext();
 
-                            // DOUBLE SÉCURITÉ : Vérification physique du dossier
                             java.io.File dbDir = new java.io.File(ctx.getApplicationInfo().dataDir + "/databases");
                             if (!dbDir.exists()) {
                                 dbDir.mkdir();
                             }
 
-                            // Récupération de la base et insertion
                             AppDatabase db = AppDatabase.getAppDatabase(ctx);
                             db.getJeuDAO().insertJoueur(nouveauJoueur);
 
-                            // Notification et fermeture sur le Thread de l'interface
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
-                                    if (getParentFragment() instanceof OnUserAddedListener) {
+                                    if (getTargetFragment() instanceof OnUserAddedListener) {
+                                        ((OnUserAddedListener) getTargetFragment()).onUserAdded();
+                                    } else if (getParentFragment() instanceof OnUserAddedListener) {
                                         ((OnUserAddedListener) getParentFragment()).onUserAdded();
                                     }
                                     dismiss();

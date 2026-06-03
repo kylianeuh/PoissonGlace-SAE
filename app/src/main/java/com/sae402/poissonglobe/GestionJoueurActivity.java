@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 
 public class GestionJoueurActivity extends AppCompatActivity {
 
-    // 1. ON DECLARE LA VARIABLE ICI TOUT EN HAUT
     private Fragment fragmentChoisi;
 
     @Override
@@ -19,7 +18,6 @@ public class GestionJoueurActivity extends AppCompatActivity {
 
         int nbJoueurs = getIntent().getIntExtra("NB_JOUEURS", 2);
 
-        // 2. ICI ON ENLEVE le mot "Fragment" devant, on fait juste l'assignation
         if (nbJoueurs == 4) {
             fragmentChoisi = new fourPlayers();
         } else {
@@ -27,7 +25,7 @@ public class GestionJoueurActivity extends AppCompatActivity {
         }
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragmentChoisi).commit();
+                .replace(R.id.fragment_container, fragmentChoisi).commitNow();
 
         findViewById(R.id.btnRetourDetails).setOnClickListener(v -> finish());
 
@@ -40,7 +38,6 @@ public class GestionJoueurActivity extends AppCompatActivity {
                     Intent intent = new Intent(GestionJoueurActivity.this, Jeu.class);
                     intent.putExtra("NB_JOUEURS", nbJoueurs);
 
-                    // Maintenant, Java accepte à 100% d'utiliser fragmentChoisi ici !
                     if (nbJoueurs == 4 && fragmentChoisi instanceof fourPlayers) {
                         fourPlayers frag = (fourPlayers) fragmentChoisi;
                         intent.putExtra("J1_NOM", frag.getSpinnerJ1().getSelectedItem() != null ? frag.getSpinnerJ1().getSelectedItem().toString() : "Joueur 1");

@@ -20,12 +20,10 @@ public class StatsActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getAppDatabase(this);
         jeuDAO = db.getJeuDAO();
 
-        // CORRECTION ASYNCHRONE : On charge les joueurs en tâche de fond
         new Thread(() -> {
             try {
                 listeGlobaleJoueurs = jeuDAO.getAllJoueurs();
 
-                // On met à jour l'interface graphique une fois la requête finie
                 runOnUiThread(() -> {
                     chargerVueSelection();
                 });
@@ -73,10 +71,9 @@ public class StatsActivity extends AppCompatActivity {
         TextView txtGagnees = findViewById(R.id.txtPartiesGagnees);
         TextView txtPoints = findViewById(R.id.txtPointsTotal);
 
-        // CORRECTION REQUÊTE : Récupération des détails sur un thread de travail rapide
         new Thread(() -> {
             try {
-                final JoueurBD joueurSelectionne = jeuDAO.getJoueurByNom(nomJoueur);
+                final JoueurBD joueurSelectionne = jeuDAO.getJoueurParNom(nomJoueur);
                 int nbPartiesCalcule = 0;
                 int scoreGlobalCalcule = 0;
 

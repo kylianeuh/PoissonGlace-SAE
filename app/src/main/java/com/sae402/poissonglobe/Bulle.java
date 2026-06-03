@@ -4,7 +4,6 @@ public class Bulle {
     public float x, y;
     public float rayon;
 
-    // Variables pour le calcul de vitesse réelle du joueur
     public float vX = 0f;
     public float vY = 0f;
     private float derniereX, derniereY;
@@ -27,7 +26,6 @@ public class Bulle {
         return (dx * dx + dy * dy) <= (this.rayon * this.rayon);
     }
 
-    // À appeler à chaque tick de physique pour mettre à jour la vitesse de la bulle
     public void calculerVitesse() {
         if (premierMouvement) {
             derniereX = x;
@@ -41,7 +39,6 @@ public class Bulle {
         derniereY = y;
     }
 
-    // Réinitialise l'historique quand le joueur lâche l'écran ou lors d'une remise en jeu
     public void reinitialiserVitesse() {
         derniereX = x;
         derniereY = y;

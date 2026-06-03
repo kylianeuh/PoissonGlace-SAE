@@ -75,41 +75,48 @@ public class Jeu extends AppCompatActivity {
     }
 
     private void enregistrerPartieEnBdd(int nbJoueurs, GameView terrainJeu) {
-        AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
-        JeuDAO dao = db.getJeuDAO();
+        // La sauvegarde de fin de partie tourne sur un thread brut : sans ce try/catch,
+        // la moindre exception BDD remonterait au gestionnaire global qui appelle
+        // System.exit(1) et ferme l'application.
+        try {
+            AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
+            JeuDAO dao = db.getJeuDAO();
 
-        String resultatGauche = (terrainJeu.scoreJoueurGau >= 6) ? "VICTOIRE" : "DEFAITE";
-        String resultatDroit = (terrainJeu.scoreJoueurDro >= 6) ? "VICTOIRE" : "DEFAITE";
+            String resultatGauche = (terrainJeu.scoreJoueurGau >= 6) ? "VICTOIRE" : "DEFAITE";
+            String resultatDroit = (terrainJeu.scoreJoueurDro >= 6) ? "VICTOIRE" : "DEFAITE";
 
-        PartieBD nouvellePartie = new PartieBD(System.currentTimeMillis(), nbJoueurs);
-        int partieId = (int) dao.insertPartie(nouvellePartie);
+            PartieBD nouvellePartie = new PartieBD(System.currentTimeMillis(), nbJoueurs);
+            int partieId = (int) dao.insertPartie(nouvellePartie);
 
-        JoueurBD j1 = dao.getJoueurParNom(terrainJeu.nomJoueurGau);
-        if (j1 != null) {
-            dao.insertJoueurPartie(new JoueurPartieBD(j1.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
-            dao.ajouterPointsGlobaux(j1.id, terrainJeu.scoreJoueurGau);
-        }
-
-        if (nbJoueurs == 4) {
-            JoueurBD j3 = dao.getJoueurParNom(terrainJeu.nomJoueurGau2);
-            if (j3 != null) {
-                dao.insertJoueurPartie(new JoueurPartieBD(j3.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
-                dao.ajouterPointsGlobaux(j3.id, terrainJeu.scoreJoueurGau);
+            JoueurBD j1 = dao.getJoueurParNom(terrainJeu.nomJoueurGau);
+            if (j1 != null) {
+                dao.insertJoueurPartie(new JoueurPartieBD(j1.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
+                dao.ajouterPointsGlobaux(j1.id, terrainJeu.scoreJoueurGau);
             }
-        }
 
-        JoueurBD j2 = dao.getJoueurParNom(terrainJeu.nomJoueurDro);
-        if (j2 != null) {
-            dao.insertJoueurPartie(new JoueurPartieBD(j2.id, partieId, terrainJeu.scoreJoueurDro, resultatDroit));
-            dao.ajouterPointsGlobaux(j2.id, terrainJeu.scoreJoueurDro);
-        }
-
-        if (nbJoueurs == 4) {
-            JoueurBD j4 = dao.getJoueurParNom(terrainJeu.nomJoueurDro2);
-            if (j4 != null) {
-                dao.insertJoueurPartie(new JoueurPartieBD(j4.id, partieId, terrainJeu.scoreJoueurDro, resultatDroit));
-                dao.ajouterPointsGlobaux(j4.id, terrainJeu.scoreJoueurDro);
+            if (nbJoueurs == 4) {
+                JoueurBD j3 = dao.getJoueurParNom(terrainJeu.nomJoueurGau2);
+                if (j3 != null) {
+                    dao.insertJoueurPartie(new JoueurPartieBD(j3.id, partieId, terrainJeu.scoreJoueurGau, resultatGauche));
+                    dao.ajouterPointsGlobaux(j3.id, terrainJeu.scoreJoueurGau);
+                }
             }
+
+            JoueurBD j2 = dao.getJoueurParNom(terrainJeu.nomJoueurDro);
+            if (j2 != null) {
+                dao.insertJoueurPartie(new JoueurPartieBD(j2.id, partieId, terrainJeu.scoreJoueurDro, resultatDroit));
+                dao.ajouterPointsGlobaux(j2.id, terrainJeu.scoreJoueurDro);
+            }
+
+            if (nbJoueurs == 4) {
+                JoueurBD j4 = dao.getJoueurParNom(terrainJeu.nomJoueurDro2);
+                if (j4 != null) {
+                    dao.insertJoueurPartie(new JoueurPartieBD(j4.id, partieId, terrainJeu.scoreJoueurDro, resultatDroit));
+                    dao.ajouterPointsGlobaux(j4.id, terrainJeu.scoreJoueurDro);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("BDD_SECURITE", "Erreur lors de l'enregistrement de la partie", e);
         }
     }
 

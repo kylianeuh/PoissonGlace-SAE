@@ -55,33 +55,57 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class, "Jeu-db")
                             .allowMainThreadQueries()
                             .fallbackToDestructiveMigration()
-                            // CORRECTION : Utilisation de onCreate pour injecter les données au moment de la création du fichier
+                            // Insertion des personnages de base lors de la création du fichier de BDD.
+                            // IMPORTANT : on écrit directement via le SupportSQLiteDatabase fourni.
+                            // Appeler un DAO ici rouvrirait la base en pleine création
+                            // (OverlappingFileLockException) et les données ne seraient jamais insérées.
                             .addCallback(new RoomDatabase.Callback() {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
-                                    // On insère immédiatement les personnages de base de façon stable
-                                    initialiserDonneesParDefaut();
+                                    initialiserDonneesParDefaut(db);
                                 }
                             })
                             .build();
+
+                    // Filet de sécurité : répare les installations dont la base existe déjà
+                    // mais est restée vide (onCreate ne se redéclenche pas dans ce cas).
+                    seedSiVide();
                 }
             }
         }
         return bddInstance;
     }
 
-    private static void initialiserDonneesParDefaut() {
+    // Insère les personnages de base sans repasser par Room (pas de récursion).
+    private static void initialiserDonneesParDefaut(@NonNull SupportSQLiteDatabase db) {
         try {
-            if (bddInstance != null && bddInstance.getJeuDAO() != null) {
-                bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Kylian"));
-                bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Lindsay"));
-                bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Maxime"));
-                bddInstance.getJeuDAO().insertJoueur(new JoueurBD("Ludwig"));
-                android.util.Log.d("BDD_SECURITE", "✓ Personnages de base créés avec succès !");
-            }
+            db.execSQL("INSERT INTO JoueurBD (nom, scoreGlobal) VALUES ('Kylian', 0)");
+            db.execSQL("INSERT INTO JoueurBD (nom, scoreGlobal) VALUES ('Lindsay', 0)");
+            db.execSQL("INSERT INTO JoueurBD (nom, scoreGlobal) VALUES ('Maxime', 0)");
+            db.execSQL("INSERT INTO JoueurBD (nom, scoreGlobal) VALUES ('Ludwig', 0)");
+            android.util.Log.d("BDD_SECURITE", "Personnages de base créés avec succès !");
         } catch (Exception e) {
             android.util.Log.e("BDD_SECURITE", "Erreur lors de l'initialisation des données", e);
         }
+    }
+
+    // Ré-amorce les joueurs par défaut si la base a été créée précédemment mais est vide.
+    private static void seedSiVide() {
+        final AppDatabase db = bddInstance;
+        if (db == null) return;
+        new Thread(() -> {
+            try {
+                if (db.getJeuDAO().getAllJoueurs().isEmpty()) {
+                    db.getJeuDAO().insertJoueur(new JoueurBD("Kylian"));
+                    db.getJeuDAO().insertJoueur(new JoueurBD("Lindsay"));
+                    db.getJeuDAO().insertJoueur(new JoueurBD("Maxime"));
+                    db.getJeuDAO().insertJoueur(new JoueurBD("Ludwig"));
+                    android.util.Log.d("BDD_SECURITE", "Base vide détectée : personnages de base ré-insérés.");
+                }
+            } catch (Exception e) {
+                android.util.Log.e("BDD_SECURITE", "Erreur lors du ré-amorçage de la base", e);
+            }
+        }).start();
     }
 }
